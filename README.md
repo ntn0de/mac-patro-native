@@ -2,6 +2,29 @@
 
 A simple and lightweight macOS menu bar application to display the Nepali date.
 
+## Configuration
+
+Before building the application, you must provide a remote URL for fetching calendar data.
+
+1.  Create a new file named `RemoteURL.swift` inside the `MacPatroNative/Sources/` directory.
+
+2.  Add the following code to the `RemoteURL.swift` file:
+
+    ```swift
+    import Foundation
+
+    struct RemoteURL {
+        static let urlString = "https://your-remote-url.com/path-to-data/"
+    }
+    ```
+
+3.  Replace `"https://your-remote-url.com/path-to-data/"` with your own URL. The server should host JSON files for each year (e.g., `2081.json`, `2082.json`).
+
+    For example:
+    ```swift
+    static let urlString = "https://ntn0de.github.io/year/"
+    ```
+
 ## Building the Application
 
 To build the application from source, follow these steps:

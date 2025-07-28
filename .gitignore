@@ -33,7 +33,7 @@ node_modules/
 *.xcarchive
 Package.resolved
 xcuserdata/
+MacPatroNative/Sources/RemoteURL.swift
 
 # Build output
 dist/
-

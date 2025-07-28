@@ -11,7 +11,7 @@ public final class DataService: DataServiceProtocol {
         case remoteError
     }
     
-    private let remoteURLString = "URL_TO_REMOTE_DATA"
+    private let remoteURLString = RemoteURL.urlString
     
     private func cacheDirectory() -> URL? {
         return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent("MacPatroNative")
