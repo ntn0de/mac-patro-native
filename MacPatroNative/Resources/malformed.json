@@ -1,0 +1,16 @@
+
+{
+    "year": 2081,
+    "days": [
+        {
+            "day": 1,
+            "events": ["New Year's Day"],
+            "holidays": ["Public Holiday"]
+        },
+        {
+            "day": 2,
+            "events": [],
+            "holidays": 
+        }
+    ]
+}
