@@ -109,6 +109,22 @@ To build the application from source, follow these steps:
     EOF
     ```
 
+## Automated Release Workflow
+
+This repository includes a GitHub Actions workflow to automate the release process. When you push a new tag (e.g., `v1.0.1`), the workflow will build the application, package it, and create a new release on GitHub with the `.app` bundle attached.
+
+### Setting Up the Remote URL for Releases
+
+The automated workflow requires a secret to be set in your repository to securely access the remote URL for the calendar data.
+
+1.  **Navigate to your repository** on GitHub.
+2.  Click on the **Settings** tab.
+3.  In the left sidebar, expand **Secrets and variables**, then click on **Actions**.
+4.  Click **New repository secret**.
+5.  For the **Name**, enter `REMOTE_URL`.
+6.  For the **Secret**, paste your full data source URL (e.g., `https://your-data-source.com/year/`).
+7.  Click **Add secret**.
+
 ## License
 
 This project is intended to be open-sourced. A license will be added in the future.

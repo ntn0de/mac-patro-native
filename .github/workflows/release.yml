@@ -1,0 +1,86 @@
+name: Release MacPatro Native
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create RemoteURL.swift
+        run: |
+          echo 'import Foundation
+          struct RemoteURL {
+              static let urlString = "${{ secrets.REMOTE_URL }}"
+          }' > MacPatroNative/Sources/RemoteURL.swift
+        env:
+          REMOTE_URL: ${{ secrets.REMOTE_URL }}
+
+      - name: Build executable
+        run: swift build -c release
+
+      - name: Create .app icon
+        run: |
+          mkdir -p icon.iconset
+          sips -z 16 16 MacPatroNative/Resources/icon.png --out icon.iconset/icon_16x16.png
+          sips -z 32 32 MacPatroNative/Resources/icon.png --out icon.iconset/icon_16x16@2x.png
+          sips -z 32 32 MacPatroNative/Resources/icon.png --out icon.iconset/icon_32x32.png
+          sips -z 64 64 MacPatroNative/Resources/icon.png --out icon.iconset/icon_32x32@2x.png
+          sips -z 128 128 MacPatroNative/Resources/icon.png --out icon.iconset/icon_128x128.png
+          sips -z 256 256 MacPatroNative/Resources/icon.png --out icon.iconset/icon_128x128@2x.png
+          sips -z 256 256 MacPatroNative/Resources/icon.png --out icon.iconset/icon_256x256.png
+          sips -z 512 512 MacPatroNative/Resources/icon.png --out icon.iconset/icon_256x256@2x.png
+          sips -z 512 512 MacPatroNative/Resources/icon.png --out icon.iconset/icon_512x512.png
+          sips -z 1024 1024 MacPatroNative/Resources/icon.png --out icon.iconset/icon_512x512@2x.png
+          iconutil -c icns icon.iconset -o MacPatroNative/Resources/icon.icns
+          rm -rf icon.iconset
+
+      - name: Create .app bundle
+        run: |
+          mkdir -p dist/MacPatroNative.app/Contents/MacOS
+          mkdir -p dist/MacPatroNative.app/Contents/Resources
+          cp .build/release/MacPatroNativeApp dist/MacPatroNative.app/Contents/MacOS/
+          cp MacPatroNative/Resources/icon.icns dist/MacPatroNative.app/Contents/Resources/
+          cat << EOF > dist/MacPatroNative.app/Contents/Info.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleExecutable</key>
+              <string>MacPatroNativeApp</string>
+              <key>CFBundleIconFile</key>
+              <string>icon.icns</string>
+              <key>CFBundleIdentifier</key>
+              <string>com.example.MacPatroNative</string>
+              <key>CFBundleName</key>
+              <string>MacPatroNative</string>
+              <key>CFBundlePackageType</key>
+              <string>APPL</string>
+              <key>CFBundleShortVersionString</key>
+              <string>1.0</string>
+              <key>CFBundleVersion</key>
+              <string>1</string>
+              <key>LSMinimumSystemVersion</key>
+              <string>13.0</string>
+          </dict>
+          </plist>
+          EOF
+
+      - name: Zip the .app bundle
+        run: |
+          cd dist
+          zip -r MacPatroNative.zip MacPatroNative.app
+          cd ..
+
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/MacPatroNative.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
