@@ -67,23 +67,23 @@ To build the application from source, follow these steps:
 
 4.  **Create the `.app` bundle structure:**
     ```bash
-    mkdir -p dist/MacPatroNative.app/Contents/MacOS
-    mkdir -p dist/MacPatroNative.app/Contents/Resources
+    mkdir -p dist/Mac\ Patro.app/Contents/MacOS
+    mkdir -p dist/Mac\ Patro.app/Contents/Resources
     ```
 
 5.  **Copy the executable:**
     ```bash
-    cp .build/release/MacPatroNativeApp dist/MacPatroNative.app/Contents/MacOS/
+    cp .build/release/MacPatroNativeApp dist/Mac\ Patro.app/Contents/MacOS/
     ```
 
 6.  **Copy the icon:**
     ```bash
-    cp MacPatroNative/Resources/icon.icns dist/MacPatroNative.app/Contents/Resources/
+    cp MacPatroNative/Resources/icon.icns dist/Mac\ Patro.app/Contents/Resources/
     ```
 
 7.  **Create the `Info.plist`:**
     ```bash
-    cat << EOF > dist/MacPatroNative.app/Contents/Info.plist
+    cat << EOF > dist/Mac\ Patro.app/Contents/Info.plist
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">
@@ -93,9 +93,9 @@ To build the application from source, follow these steps:
         <key>CFBundleIconFile</key>
         <string>icon.icns</string>
         <key>CFBundleIdentifier</key>
-        <string>com.example.MacPatroNative</string>
+        <string>com.example.MacPatro</string>
         <key>CFBundleName</key>
-        <string>MacPatroNative</string>
+        <string>Mac Patro</string>
         <key>CFBundlePackageType</key>
         <string>APPL</string>
         <key>CFBundleShortVersionString</key>
