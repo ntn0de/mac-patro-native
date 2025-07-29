@@ -2,7 +2,41 @@
 
 A simple and lightweight macOS menu bar application to display the Nepali date.
 
-## Configuration
+## Installation
+
+The easiest way to install Mac Patro is to download the latest release from the [GitHub Releases](https://github.com/ntn0de/mac-patro-native/releases) page.
+
+1.  Go to the Releases page.
+2.  Download the `.dmg` file from the latest release.
+3.  Open the `.dmg` file and drag `Mac Patro.app` to your `Applications` folder.
+
+
+## Troubleshooting
+
+### "App is damaged and can’t be opened. You should move it to the Trash."
+
+This can happen if macOS has quarantined the app because it was downloaded from the internet and not notarized. To fix this, open the Terminal app and run the following command, which removes the quarantine attribute from the app.
+
+```bash
+xattr -cr /Applications/Mac\ Patro.app
+```
+
+After running the command, you should be able to open the app.
+
+
+## Building from Source
+
+If you prefer to build the application from the source code, follow these instructions.
+
+### Prerequisites
+
+To build the DMG installer, you will need to install `create-dmg`. You can install it using [Homebrew](https://brew.sh/):
+
+```bash
+brew install create-dmg
+```
+
+### Configuration
 
 Before building the application, you must provide a remote URL for fetching calendar data.
 
@@ -25,13 +59,11 @@ Before building the application, you must provide a remote URL for fetching cale
     static let urlString = "https://ntn0de.github.io/year/"
     ```
 
-## Building the Application
-
-To build the application from source, follow these steps:
+### Build Steps
 
 1.  **Clone the repository:**
     ```bash
-    git clone <repository-url>
+    git clone https://github.com/ntn0de/mac-patro-native.git
     cd mac-patro-native
     ```
 
@@ -108,10 +140,25 @@ To build the application from source, follow these steps:
     </plist>
     EOF
     ```
+8.  **Build the DMG:**
+    This step packages the `.app` bundle into a `.dmg` installer.
+    ```bash
+    create-dmg \
+      --volname "Mac Patro Installer" \
+      --window-pos 200 120 \
+      --window-size 800 400 \
+      --icon-size 100 \
+      --icon "Mac Patro.app" 200 190 \
+      --hide-extension "Mac Patro.app" \
+      --app-drop-link 600 185 \
+      "dist/Mac Patro v1.0.0.dmg" \
+      "dist/Mac Patro.app"
+    ```
+    *Note: Replace `v1.0.0` with the desired version number.*
 
 ## Automated Release Workflow
 
-This repository includes a GitHub Actions workflow to automate the release process. When you push a new tag (e.g., `v1.0.1`), the workflow will build the application, package it, and create a new release on GitHub with the `.app` bundle attached.
+This repository includes a GitHub Actions workflow to automate the release process. When you push a new tag (e.g., `v1.0.1`), the workflow will build the application, package it, and create a new release on GitHub with the `.dmg` file attached.
 
 ### Setting Up the Remote URL for Releases
 
@@ -124,6 +171,7 @@ The automated workflow requires a secret to be set in your repository to securel
 5.  For the **Name**, enter `REMOTE_URL`.
 6.  For the **Secret**, paste your full data source URL (e.g., `https://your-data-source.com/year/`).
 7.  Click **Add secret**.
+
 
 ## License
 
