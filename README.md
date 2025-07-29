@@ -67,9 +67,9 @@ Before building the application, you must provide a remote URL for fetching cale
     cd mac-patro-native
     ```
 
-2.  **Build the executable:**
+2.  **Build the universal executable:**
     ```bash
-    swift build -c release
+    swift build -c release --arch arm64 --arch x86_64
     ```
 
 3.  **Create the application icon:**
@@ -105,7 +105,7 @@ Before building the application, you must provide a remote URL for fetching cale
 
 5.  **Copy the executable:**
     ```bash
-    cp .build/release/MacPatroNativeApp dist/Mac\ Patro.app/Contents/MacOS/
+    cp .build/apple/Products/Release/MacPatroNativeApp dist/Mac\ Patro.app/Contents/MacOS/
     ```
 
 6.  **Copy the icon:**
@@ -136,6 +136,8 @@ Before building the application, you must provide a remote URL for fetching cale
         <string>1</string>
         <key>LSMinimumSystemVersion</key>
         <string>13.0</string>
+        <key>LSUIElement</key>
+        <string>1</string>
     </dict>
     </plist>
     EOF

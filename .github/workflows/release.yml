@@ -31,8 +31,8 @@ jobs:
         env:
           REMOTE_URL: ${{ secrets.REMOTE_URL }}
 
-      - name: Build executable
-        run: swift build -c release
+      - name: Build universal executable
+        run: swift build -c release --arch arm64 --arch x86_64
 
       - name: Create .app icon
         run: |
@@ -54,7 +54,7 @@ jobs:
         run: |
           mkdir -p dist/Mac\ Patro.app/Contents/MacOS
           mkdir -p dist/Mac\ Patro.app/Contents/Resources
-          cp .build/release/MacPatroNativeApp dist/Mac\ Patro.app/Contents/MacOS/
+          cp .build/apple/Products/Release/MacPatroNativeApp dist/Mac\ Patro.app/Contents/MacOS/
           cp MacPatroNative/Resources/icon.icns dist/Mac\ Patro.app/Contents/Resources/
           PLIST_PATH="dist/Mac Patro.app/Contents/Info.plist"
           cat << EOF > $PLIST_PATH
@@ -78,6 +78,8 @@ jobs:
               <string>VERSION_PLACEHOLDER</string>
               <key>LSMinimumSystemVersion</key>
               <string>13.0</string>
+              <key>LSUIElement</key>
+              <string>1</string>
           </dict>
           </plist>
           EOF
