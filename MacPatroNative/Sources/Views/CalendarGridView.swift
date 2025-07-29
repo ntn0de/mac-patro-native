@@ -17,7 +17,7 @@ public struct CalendarGridView: View {
                     Text(dayLabel)
                         .font(.headline)
                         .fontWeight(.medium)
-                        .foregroundStyle(Color.white)
+                        .foregroundStyle(dayLabel == "शनि" ? Color.red : Color.primary)
                         .frame(maxWidth: .infinity)
                 }
             }

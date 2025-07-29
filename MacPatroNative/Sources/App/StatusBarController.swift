@@ -26,10 +26,7 @@ class StatusBarController: NSObject, NSPopoverDelegate {
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(rootView: mainView)
         popover.delegate = self
-        popover.setValue(true, forKeyPath: "shouldHideAnchor")
         
-        
-
         let aboutMenuItem = NSMenuItem(title: "About", action: #selector(about), keyEquivalent: "")
         aboutMenuItem.target = self
         menu.addItem(aboutMenuItem)
