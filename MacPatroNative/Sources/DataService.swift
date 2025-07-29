@@ -9,6 +9,7 @@ public final class DataService: DataServiceProtocol {
         case fileNotFound
         case decodingFailed
         case remoteError
+        case invalidRemoteData
     }
     
     private let remoteURLString = RemoteURL.urlString
@@ -23,12 +24,22 @@ public final class DataService: DataServiceProtocol {
         return cacheDirectory.appendingPathComponent("\(year).json")
     }
     
+    private func isValid(data: YearData) -> Bool {
+        // Failsafe checks: last_updated_at must be present, and we must have exactly 12 months of data.
+        guard data.lastUpdatedAt > 0, data.data.count == 12 else {
+            log("Validation failed: Invalid remote data received.")
+            return false
+        }
+        log("Validation successful: Remote data is valid.")
+        return true
+    }
+    
     public func loadData(forYear year: Int, bundle: Bundle = .main, completion: @escaping (Result<YearData, Error>) -> Void) {
-        print("Requesting data for year: \(year)")
+        log("Requesting data for year: \(year)")
 
         // 1. Check for cached data first
         if let cacheURL = cacheFileURL(forYear: year), let data = try? Data(contentsOf: cacheURL) {
-            print("Cache hit for year \(year).")
+            log("Cache hit for year \(year).")
             do {
                 let calendarYear = try JSONDecoder().decode(YearData.self, from: data)
                 completion(.success(calendarYear))
@@ -36,54 +47,65 @@ public final class DataService: DataServiceProtocol {
                 checkForUpdates(forYear: year, cachedData: calendarYear)
                 return
             } catch {
-                print("Corrupted cache for year \(year). Deleting and fetching fresh.")
+                log("Corrupted cache for year \(year). Deleting and fetching fresh.")
                 try? FileManager.default.removeItem(at: cacheURL)
             }
         }
 
         // 2. If no cache, fetch from remote, with fallback to bundled
-        print("Cache miss for year \(year). Fetching fresh data.")
+        log("Cache miss for year \(year). Fetching fresh data.")
         fetchRemoteData(forYear: year) { remoteResult in
             DispatchQueue.main.async {
                 switch remoteResult {
                 case .success(let remoteYearData):
-                    print("Remote fetch successful for year \(year). Caching.")
-                    if let cacheURL = self.cacheFileURL(forYear: year), let data = try? JSONEncoder().encode(remoteYearData) {
-                        try? data.write(to: cacheURL)
-                    }
-                    completion(.success(remoteYearData))
-                case .failure:
-                    print("Remote fetch failed for year \(year). Falling back to bundled data.")
-                    let fileName = "\(year)"
-                    guard let fileURL = bundle.url(forResource: fileName, withExtension: "json") else {
-                        completion(.failure(DataServiceError.fileNotFound))
-                        return
-                    }
-                    do {
-                        let data = try Data(contentsOf: fileURL)
-                        let calendarYear = try JSONDecoder().decode(YearData.self, from: data)
-                        print("Successfully loaded bundled data for year \(year). Caching it.")
-                        if let cacheURL = self.cacheFileURL(forYear: year) {
+                    if self.isValid(data: remoteYearData) {
+                        log("Remote fetch successful for year \(year). Caching.")
+                        if let cacheURL = self.cacheFileURL(forYear: year), let data = try? JSONEncoder().encode(remoteYearData) {
                             try? data.write(to: cacheURL)
                         }
-                        completion(.success(calendarYear))
-                    } catch {
-                        completion(.failure(DataServiceError.decodingFailed))
+                        completion(.success(remoteYearData))
+                    } else {
+                        // If validation fails, treat it like a remote error and use bundled data.
+                        self.loadBundledData(forYear: year, bundle: bundle, completion: completion)
                     }
+                case .failure:
+                    log("Remote fetch failed for year \(year). Falling back to bundled data.")
+                    self.loadBundledData(forYear: year, bundle: bundle, completion: completion)
                 }
             }
         }
     }
     
+    private func loadBundledData(forYear year: Int, bundle: Bundle, completion: @escaping (Result<YearData, Error>) -> Void) {
+        let fileName = "\(year)"
+        guard let fileURL = bundle.url(forResource: fileName, withExtension: "json") else {
+            completion(.failure(DataServiceError.fileNotFound))
+            return
+        }
+        do {
+            let data = try Data(contentsOf: fileURL)
+            let calendarYear = try JSONDecoder().decode(YearData.self, from: data)
+            log("Successfully loaded bundled data for year \(year). Caching it.")
+            if let cacheURL = self.cacheFileURL(forYear: year) {
+                try? data.write(to: cacheURL)
+            }
+            completion(.success(calendarYear))
+        } catch {
+            completion(.failure(DataServiceError.decodingFailed))
+        }
+    }
+    
     private func checkForUpdates(forYear year: Int, cachedData: YearData) {
         fetchRemoteData(forYear: year) { result in
-            if case .success(let remoteData) = result, remoteData.lastUpdatedAt > cachedData.lastUpdatedAt {
-                print("Found newer data for year \(year). Updating cache in background.")
+            if case .success(let remoteData) = result,
+               self.isValid(data: remoteData),
+               remoteData.lastUpdatedAt > cachedData.lastUpdatedAt {
+                log("Found newer data for year \(year). Updating cache in background.")
                 if let cacheURL = self.cacheFileURL(forYear: year), let data = try? JSONEncoder().encode(remoteData) {
                     try? data.write(to: cacheURL)
                 }
             } else {
-                print("No new data found for year \(year).")
+                log("No new valid data found for year \(year).")
             }
         }
     }
