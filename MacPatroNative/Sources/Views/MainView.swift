@@ -1,9 +1,8 @@
 import SwiftUI
 
 public struct MainView: View {
-    @StateObject private var viewModel = CalendarViewModel()
+    @StateObject public var viewModel = CalendarViewModel()
     @StateObject private var menuBarViewModel = MenuBarViewModel()
-    @State private var showAboutView = false
     
     public init() {}
     
@@ -15,23 +14,8 @@ public struct MainView: View {
             Spacer()
         }
         .padding()
-        .background(.ultraThinMaterial.opacity(0.05))
+        .background(.ultraThinMaterial.opacity(0.5))
         .frame(maxWidth: 360)
-        .preferredColorScheme(.dark)
-        .contextMenu {
-//            Button("About") {
-//                showAboutView.toggle()
-//            }
-//            Button("Settings") {
-//                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-//            }
-            Button("Force update year data") {
-                viewModel.forceRefresh()
-            }
-        }
-        .sheet(isPresented: $showAboutView) {
-            AboutView()
-        }
     }
 }
 

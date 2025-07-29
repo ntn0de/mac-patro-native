@@ -181,7 +181,7 @@ public class CalendarViewModel: ObservableObject {
         fetchAndGenerateCalendar()
     }
 
-    func forceRefresh() {
+    public func forceRefresh() {
         self.yearData = nil
         fetchAndGenerateCalendar()
     }
