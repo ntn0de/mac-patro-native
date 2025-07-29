@@ -90,6 +90,7 @@ jobs:
 
       - name: Build DMG
         run: |
+          VERSIONED_DMG="dist/Mac Patro v${{ env.VERSION }}.dmg"
           create-dmg \
             --volname "Mac Patro Installer" \
             --window-pos 200 120 \
@@ -98,8 +99,9 @@ jobs:
             --icon "Mac Patro.app" 200 190 \
             --hide-extension "Mac Patro.app" \
             --app-drop-link 600 185 \
-            "dist/Mac Patro v${{ env.VERSION }}.dmg" \
+            "$VERSIONED_DMG" \
             "dist/Mac Patro.app"
+          cp "$VERSIONED_DMG" "dist/Mac-Patro-latest.dmg"
 
       - name: Create Release and Upload Asset
         uses: softprops/action-gh-release@v2
