@@ -12,6 +12,7 @@ class StatusBarController: NSObject, NSPopoverDelegate {
     private var mainView: MainView
     private var eventMonitor: EventMonitor?
     private var aboutWindow: NSWindow?
+    private var settingsWindow: NSWindow?
 
     override init() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -34,6 +35,10 @@ class StatusBarController: NSObject, NSPopoverDelegate {
         let forceUpdateMenuItem = NSMenuItem(title: "Force update year data", action: #selector(forceUpdate), keyEquivalent: "")
         forceUpdateMenuItem.target = self
         menu.addItem(forceUpdateMenuItem)
+
+        let settingsMenuItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ",")
+        settingsMenuItem.target = self
+        menu.addItem(settingsMenuItem)
 
         let quitMenuItem = NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         menu.addItem(quitMenuItem)
@@ -65,10 +70,7 @@ class StatusBarController: NSObject, NSPopoverDelegate {
                 closePopover(sender: sender)
             } else {
                 if let button = statusItem.button {
-                    // By setting the popover's anchor to a zero-height rect at the top
-                    // of the button, we can move it up to close the gap.
-                    let positioningRect = NSRect(x: 0, y: button.bounds.height, width: button.bounds.width, height: 0)
-                    
+                    let positioningRect = NSRect(x: 0, y: button.bounds.height + 12, width: button.bounds.width, height: 0)
                     NSApp.activate(ignoringOtherApps: true)
                     popover.show(relativeTo: positioningRect, of: button, preferredEdge: .minY)
                     eventMonitor?.start()
@@ -104,4 +106,21 @@ class StatusBarController: NSObject, NSPopoverDelegate {
     @objc func forceUpdate() {
         mainView.viewModel.forceRefresh()
     }
+
+    @objc func openSettings() {
+        if settingsWindow == nil {
+            let settingsView = SettingsView()
+            let hostingController = NSHostingController(rootView: settingsView)
+            let window = NSWindow(contentViewController: hostingController)
+            window.title = "Settings"
+            window.isReleasedWhenClosed = false
+            window.level = .floating
+            settingsWindow = window
+        }
+        
+        NSApp.activate(ignoringOtherApps: true)
+        settingsWindow?.makeKeyAndOrderFront(nil)
+        settingsWindow?.orderFrontRegardless()
+    }
 }
+

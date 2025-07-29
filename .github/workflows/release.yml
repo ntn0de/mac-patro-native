@@ -15,6 +15,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set Version from Tag
+        run: |
+          # Extract version from tag (e.g., v1.2.3 -> 1.2.3)
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          sed -i '' "s/static let version = \".*\"/static let version = \"$VERSION\"/" MacPatroNative/Sources/Version.swift
+
       - name: Create RemoteURL.swift
         run: |
           echo 'import Foundation
@@ -49,7 +56,8 @@ jobs:
           mkdir -p dist/Mac\ Patro.app/Contents/Resources
           cp .build/release/MacPatroNativeApp dist/Mac\ Patro.app/Contents/MacOS/
           cp MacPatroNative/Resources/icon.icns dist/Mac\ Patro.app/Contents/Resources/
-          cat << EOF > dist/Mac\ Patro.app/Contents/Info.plist
+          PLIST_PATH="dist/Mac Patro.app/Contents/Info.plist"
+          cat << EOF > $PLIST_PATH
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -65,24 +73,35 @@ jobs:
               <key>CFBundlePackageType</key>
               <string>APPL</string>
               <key>CFBundleShortVersionString</key>
-              <string>1.0</string>
+              <string>VERSION_PLACEHOLDER</string>
               <key>CFBundleVersion</key>
-              <string>1</string>
+              <string>VERSION_PLACEHOLDER</string>
               <key>LSMinimumSystemVersion</key>
               <string>13.0</string>
           </dict>
           </plist>
           EOF
+          sed -i '' "s/VERSION_PLACEHOLDER/${{ env.VERSION }}/g" $PLIST_PATH
 
-      - name: Zip the .app bundle
+      - name: Install create-dmg
+        run: brew install create-dmg
+
+      - name: Build DMG
         run: |
-          cd dist
-          zip -r Mac\ Patro.zip Mac\ Patro.app
-          cd ..
+          create-dmg \
+            --volname "Mac Patro Installer" \
+            --window-pos 200 120 \
+            --window-size 800 400 \
+            --icon-size 100 \
+            --icon "Mac Patro.app" 200 190 \
+            --hide-extension "Mac Patro.app" \
+            --app-drop-link 600 185 \
+            "dist/Mac Patro v${{ env.VERSION }}.dmg" \
+            "dist/Mac Patro.app"
 
       - name: Create Release and Upload Asset
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/Mac\ Patro.zip
+          files: dist/*.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
