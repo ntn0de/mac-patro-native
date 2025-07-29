@@ -19,9 +19,9 @@ public struct MainView: View {
         .frame(maxWidth: 360)
         .preferredColorScheme(.dark)
         .contextMenu {
-            Button("About") {
-                showAboutView.toggle()
-            }
+//            Button("About") {
+//                showAboutView.toggle()
+//            }
 //            Button("Settings") {
 //                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
 //            }
