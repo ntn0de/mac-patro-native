@@ -57,7 +57,7 @@ jobs:
           cp .build/apple/Products/Release/MacPatroNativeApp dist/Mac\ Patro.app/Contents/MacOS/
           cp MacPatroNative/Resources/icon.icns dist/Mac\ Patro.app/Contents/Resources/
           PLIST_PATH="dist/Mac Patro.app/Contents/Info.plist"
-          cat << EOF > $PLIST_PATH
+          cat << EOF > "$PLIST_PATH"
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -83,7 +83,7 @@ jobs:
           </dict>
           </plist>
           EOF
-          sed -i '' "s/VERSION_PLACEHOLDER/${{ env.VERSION }}/g" $PLIST_PATH
+          sed -i '' "s/VERSION_PLACEHOLDER/${{ env.VERSION }}/g" "$PLIST_PATH"
 
       - name: Install create-dmg
         run: brew install create-dmg
