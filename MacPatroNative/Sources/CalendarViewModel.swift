@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Combine
 
 public class CalendarViewModel: ObservableObject {
     @Published var days: [CalendarCellInfo] = []
@@ -11,26 +12,43 @@ public class CalendarViewModel: ObservableObject {
     private var currentYear: Int = 0
     
     private var dataService: DataServiceProtocol
+    private var cancellables = Set<AnyCancellable>()
     
     public init(date: Date = Date(), dataService: DataServiceProtocol = DataService()) {
         self.date = date
         self.dataService = dataService
         fetchAndGenerateCalendar()
+        
+        // Subscribe to the centralized day change publisher
+        DateChangeService.shared.dayDidChange
+            .sink { [weak self] in
+                #if DEBUG
+                print("CalendarViewModel received day change notification. Refreshing.")
+                #endif
+                self?.goToToday()
+            }
+            .store(in: &cancellables)
     }
     
     private func fetchAndGenerateCalendar() {
         let nepaliDate = DateConverter.toNepaliDate(from: date)!
         if self.yearData == nil || nepaliDate.bsYear != self.currentYear {
+            #if DEBUG
             print("Year changed or no data. Fetching for \(nepaliDate.bsYear)")
+            #endif
             self.currentYear = nepaliDate.bsYear
             dataService.loadData(forYear: nepaliDate.bsYear, bundle: .main) { result in
                 DispatchQueue.main.async {
                     switch result {
                     case .success(let yearData):
                         self.yearData = yearData
+                        #if DEBUG
                         print("Data loaded for \(yearData.data.count) months. First event: \(yearData.data.first?.days.first?.event ?? "N/A")")
+                        #endif
                     case .failure(let error):
+                        #if DEBUG
                         print("Failed to load year data: \(error)")
+                        #endif
                         self.yearData = nil
                     }
                     self.generateCalendar()

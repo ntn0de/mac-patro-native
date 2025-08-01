@@ -8,23 +8,28 @@ public class MenuBarViewModel: ObservableObject {
     @Published public var iconName: String = "1"
     @Published public var menuBarIconText: String = ""
 
-    private var settingsCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
     private let settings = SettingsService.shared
 
     public init() {
         updateMenuBarText()
         
         // Update whenever the settings change
-        settingsCancellable = settings.objectWillChange.sink { [weak self] _ in
-            DispatchQueue.main.async {
+        settings.objectWillChange
+            .sink { [weak self] _ in
                 self?.updateMenuBarText()
             }
-        }
+            .store(in: &cancellables)
         
-        // Also update every minute
-        Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
-            self?.updateMenuBarText()
-        }
+        // Subscribe to the centralized day change publisher
+        DateChangeService.shared.dayDidChange
+            .sink { [weak self] in
+                #if DEBUG
+                print("MenuBarViewModel received day change notification. Refreshing.")
+                #endif
+                self?.updateMenuBarText()
+            }
+            .store(in: &cancellables)
     }
 
     private func updateMenuBarText() {

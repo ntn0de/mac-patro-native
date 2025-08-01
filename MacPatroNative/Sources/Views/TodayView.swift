@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 public struct TodayView: View {
     @ObservedObject var viewModel: TodayViewModel
@@ -72,10 +73,21 @@ public class TodayViewModel: ObservableObject {
     @Published public var event: String?
 
     private var calendarViewModel: CalendarViewModel
+    private var cancellables = Set<AnyCancellable>()
 
     public init(calendarViewModel: CalendarViewModel = CalendarViewModel()) {
         self.calendarViewModel = calendarViewModel
         fetchData()
+        
+        // Subscribe to the centralized day change publisher
+        DateChangeService.shared.dayDidChange
+            .sink { [weak self] in
+                #if DEBUG
+                print("TodayViewModel received day change notification. Refreshing.")
+                #endif
+                self?.fetchData()
+            }
+            .store(in: &cancellables)
     }
 
     public func fetchData(for date: Date = Date()) {
