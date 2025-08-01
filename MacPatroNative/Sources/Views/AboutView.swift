@@ -9,7 +9,7 @@ public struct AboutView: View {
         VStack {
             Text("MacPatro")
                 .font(.title)
-            Text("Version 1.0.0")
+            Text("Version \(AppVersion.version)")
                 .font(.caption)
             Text("by Saroj Subedi")
                 .font(.caption)
