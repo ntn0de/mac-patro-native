@@ -11,13 +11,13 @@ extension CalendarViewModel {
             return false
         }
         
-        return isHoliday(date: nepaliDate)
+        return isTodayHoliday(date: nepaliDate)
     }
 
     func event(for date: Date) -> String? {
         guard let nepaliDate = DateConverter.toNepaliDate(from: date) else {
             return nil
         }
-        return getEvent(date: nepaliDate)
+        return getTodayEvent(date: nepaliDate)
     }
 }

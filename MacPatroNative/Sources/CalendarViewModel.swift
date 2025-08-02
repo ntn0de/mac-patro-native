@@ -9,6 +9,7 @@ public class CalendarViewModel: ObservableObject {
     
     private var date: Date
     private var yearData: YearData?
+    private var todayYearData: YearData?
     private var currentYear: Int = 0
     
     private var dataService: DataServiceProtocol
@@ -18,6 +19,9 @@ public class CalendarViewModel: ObservableObject {
         self.date = date
         self.dataService = dataService
         fetchAndGenerateCalendar()
+        
+        // Load data for today's events
+        loadTodayData()
         
         // Subscribe to the centralized day change publisher
         DateChangeService.shared.dayDidChange
@@ -152,16 +156,26 @@ public class CalendarViewModel: ObservableObject {
     }
     
     func isHoliday(date: NepaliDate) -> Bool {
-        guard let dayData = getDayData(for: date) else { return false }
+        guard let dayData = getDayData(for: date, from: yearData) else { return false }
         return dayData.isHoliday
     }
 
     func getEvent(date: NepaliDate) -> String? {
-        guard let dayData = getDayData(for: date), !dayData.event.isEmpty, dayData.event != "--" else { return nil }
+        guard let dayData = getDayData(for: date, from: yearData), !dayData.event.isEmpty, dayData.event != "--" else { return nil }
+        return dayData.event
+    }
+    
+    func isTodayHoliday(date: NepaliDate) -> Bool {
+        guard let dayData = getDayData(for: date, from: todayYearData) else { return false }
+        return dayData.isHoliday
+    }
+    
+    func getTodayEvent(date: NepaliDate) -> String? {
+        guard let dayData = getDayData(for: date, from: todayYearData), !dayData.event.isEmpty, dayData.event != "--" else { return nil }
         return dayData.event
     }
 
-    private func getDayData(for date: NepaliDate) -> DayData? {
+    private func getDayData(for date: NepaliDate, from yearData: YearData?) -> DayData? {
         guard let yearData = yearData,
               let monthData = yearData.data.first(where: { $0.month == date.bsMonth }),
               let dayData = monthData.days.first(where: { $0.dayInEn == String(date.bsDay) })
@@ -211,7 +225,26 @@ public class CalendarViewModel: ObservableObject {
 
     public func forceRefresh() {
         self.yearData = nil
+        self.todayYearData = nil
         fetchAndGenerateCalendar()
+        loadTodayData()
+    }
+
+    private func loadTodayData() {
+        let todayNepali = DateConverter.toNepaliDate(from: Date())!
+        dataService.loadData(forYear: todayNepali.bsYear, bundle: .main) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let yearData):
+                    self.todayYearData = yearData
+                case .failure(let error):
+                    #if DEBUG
+                    print("Failed to load today's year data: \(error)")
+                    #endif
+                    self.todayYearData = nil
+                }
+            }
+        }
     }
 }
 
