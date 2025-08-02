@@ -1,7 +1,10 @@
 import Foundation
 
+import Combine
+
 public class SettingsService: ObservableObject {
     public static let shared = SettingsService()
+    public let settingsChangedPublisher = PassthroughSubject<Void, Never>()
 
     public enum DateFormat: String, CaseIterable, Identifiable {
         case day = "D"
@@ -36,12 +39,14 @@ public class SettingsService: ObservableObject {
     @Published public var dateFormat: DateFormat {
         didSet {
             UserDefaults.standard.set(dateFormat.rawValue, forKey: "menuBarDateFormat")
+            settingsChangedPublisher.send()
         }
     }
 
     @Published public var separator: Separator {
         didSet {
             UserDefaults.standard.set(separator.rawValue, forKey: "menuBarSeparator")
+            settingsChangedPublisher.send()
         }
     }
 

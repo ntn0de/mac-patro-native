@@ -17,7 +17,7 @@ public class MenuBarViewModel: ObservableObject {
         updateMenuBarText()
         
         // Update whenever the settings change
-        settings.objectWillChange
+        settings.settingsChangedPublisher
             .sink { [weak self] _ in
                 self?.updateMenuBarText()
             }
