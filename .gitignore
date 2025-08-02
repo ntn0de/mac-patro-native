@@ -36,4 +36,8 @@ xcuserdata/
 MacPatroNative/Sources/RemoteURL.swift
 
 # Build output
-dist/\n# Build artifacts\ndefault.profraw\n*.profraw
+dist/
+
+# Build artifacts
+default.profraw
+*.profraw
