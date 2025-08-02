@@ -28,6 +28,16 @@ public class CalendarViewModel: ObservableObject {
                 self?.goToToday()
             }
             .store(in: &cancellables)
+
+        // Subscribe to data update notifications
+        dataService.dataDidUpdate
+            .sink { [weak self] _ in
+                #if DEBUG
+                print("CalendarViewModel received new data notification. Forcing refresh.")
+                #endif
+                self?.forceRefresh()
+            }
+            .store(in: &cancellables)
     }
     
     private func fetchAndGenerateCalendar() {

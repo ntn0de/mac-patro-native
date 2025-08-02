@@ -10,8 +10,10 @@ public class MenuBarViewModel: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
     private let settings = SettingsService.shared
+    private let dataService: DataServiceProtocol
 
-    public init() {
+    public init(dataService: DataServiceProtocol = DataService()) {
+        self.dataService = dataService
         updateMenuBarText()
         
         // Update whenever the settings change
@@ -26,6 +28,16 @@ public class MenuBarViewModel: ObservableObject {
             .sink { [weak self] in
                 #if DEBUG
                 print("MenuBarViewModel received day change notification. Refreshing.")
+                #endif
+                self?.updateMenuBarText()
+            }
+            .store(in: &cancellables)
+
+        // Subscribe to data update notifications
+        dataService.dataDidUpdate
+            .sink { [weak self] _ in
+                #if DEBUG
+                print("MenuBarViewModel received new data notification. Refreshing.")
                 #endif
                 self?.updateMenuBarText()
             }

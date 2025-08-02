@@ -1,7 +1,13 @@
 
 import Foundation
+import Combine
 
 public final class DataService: DataServiceProtocol {
+    
+    private let dataUpdatePublisher = PassthroughSubject<Void, Never>()
+    public var dataDidUpdate: AnyPublisher<Void, Never> {
+        dataUpdatePublisher.eraseToAnyPublisher()
+    }
     
     public init() {}
     
@@ -103,6 +109,8 @@ public final class DataService: DataServiceProtocol {
                 log("Found newer data for year \(year). Updating cache in background.")
                 if let cacheURL = self.cacheFileURL(forYear: year), let data = try? JSONEncoder().encode(remoteData) {
                     try? data.write(to: cacheURL)
+                    // Notify the app that new data is available
+                    self.dataUpdatePublisher.send()
                 }
             } else {
                 log("No new valid data found for year \(year).")
