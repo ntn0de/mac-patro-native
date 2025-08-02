@@ -9,7 +9,7 @@ public class CalendarViewModel: ObservableObject {
     
     private var date: Date
     private var yearData: YearData?
-    private var todayYearData: YearData?
+    @Published var todayYearData: YearData?
     private var currentYear: Int = 0
     
     private var dataService: DataServiceProtocol
@@ -107,7 +107,8 @@ public class CalendarViewModel: ObservableObject {
                             date: prevDayGregorian,
                             isCurrentMonth: false,
                             isHoliday: isHoliday(date: prevDayNepali),
-                            event: getEvent(date: prevDayNepali)
+                            event: getEvent(date: prevDayNepali),
+                            tithi: getTithi(date: prevDayNepali)
                         )
                     )
                 }
@@ -125,7 +126,8 @@ public class CalendarViewModel: ObservableObject {
                         date: currentGregorianDate,
                         isCurrentMonth: true,
                         isHoliday: isHoliday(date: currentNepaliDate),
-                        event: getEvent(date: currentNepaliDate)
+                        event: getEvent(date: currentNepaliDate),
+                        tithi: getTithi(date: currentNepaliDate)
                     )
                 )
             }
@@ -145,7 +147,8 @@ public class CalendarViewModel: ObservableObject {
                             date: nextDayGregorian,
                             isCurrentMonth: false,
                             isHoliday: isHoliday(date: nextDayNepali),
-                            event: getEvent(date: nextDayNepali)
+                            event: getEvent(date: nextDayNepali),
+                            tithi: getTithi(date: nextDayNepali)
                         )
                     )
                 }
@@ -164,6 +167,11 @@ public class CalendarViewModel: ObservableObject {
         guard let dayData = getDayData(for: date, from: yearData), !dayData.event.isEmpty, dayData.event != "--" else { return nil }
         return dayData.event
     }
+
+    func getTithi(date: NepaliDate) -> String? {
+        guard let dayData = getDayData(for: date, from: yearData), let tithi = dayData.tithi, !tithi.isEmpty else { return nil }
+        return tithi
+    }
     
     func isTodayHoliday(date: NepaliDate) -> Bool {
         guard let dayData = getDayData(for: date, from: todayYearData) else { return false }
@@ -173,6 +181,11 @@ public class CalendarViewModel: ObservableObject {
     func getTodayEvent(date: NepaliDate) -> String? {
         guard let dayData = getDayData(for: date, from: todayYearData), !dayData.event.isEmpty, dayData.event != "--" else { return nil }
         return dayData.event
+    }
+
+    func getTodayTithi(date: NepaliDate) -> String? {
+        guard let dayData = getDayData(for: date, from: todayYearData), let tithi = dayData.tithi, !tithi.isEmpty else { return nil }
+        return tithi
     }
 
     private func getDayData(for date: NepaliDate, from yearData: YearData?) -> DayData? {
@@ -256,4 +269,5 @@ public struct CalendarCellInfo: Identifiable, Hashable {
     public let isCurrentMonth: Bool
     public let isHoliday: Bool
     public let event: String?
+    public let tithi: String?
 }

@@ -44,15 +44,21 @@ public struct CalendarDayCellView: View {
             }
         }
         .onTapGesture {
-            if dayInfo.event != nil {
+            if dayInfo.event != nil || dayInfo.tithi != nil {
                 showingPopover = true
             }
         }
         .popover(isPresented: $showingPopover) {
-            if let event = dayInfo.event {
-                Text(event)
-                    .padding()
+            VStack(alignment: .leading, spacing: 5) {
+                if let tithi = dayInfo.tithi {
+                    Text(tithi)
+                        .fontWeight(.semibold)
+                }
+                if let event = dayInfo.event {
+                    Text(event)
+                }
             }
+            .padding()
         }
     }
     
@@ -79,12 +85,12 @@ struct CalendarDayCellView_Previews: PreviewProvider {
 //            Color.black.ignoresSafeArea()
             VStack {
                 HStack {
-                    CalendarDayCellView(dayInfo: .init(nepaliDay: "१", englishDay: 15, date: today, isCurrentMonth: true, isHoliday: true, event: "New Year"))
-                    CalendarDayCellView(dayInfo: .init(nepaliDay: "२", englishDay: 16, date: tomorrow, isCurrentMonth: true, isHoliday: false, event: nil))
+                    CalendarDayCellView(dayInfo: .init(nepaliDay: "१", englishDay: 15, date: today, isCurrentMonth: true, isHoliday: true, event: "New Year", tithi: "प्रतिपदा"))
+                    CalendarDayCellView(dayInfo: .init(nepaliDay: "२", englishDay: 16, date: tomorrow, isCurrentMonth: true, isHoliday: false, event: nil, tithi: "द्वितीया"))
                 }
                 HStack {
-                    CalendarDayCellView(dayInfo: .init(nepaliDay: "३", englishDay: 17, date: weekend, isCurrentMonth: true, isHoliday: false, event: nil))
-                    CalendarDayCellView(dayInfo: .init(nepaliDay: "४", englishDay: 18, date: prevMonthDay, isCurrentMonth: false, isHoliday: false, event: nil))
+                    CalendarDayCellView(dayInfo: .init(nepaliDay: "३", englishDay: 17, date: weekend, isCurrentMonth: true, isHoliday: false, event: nil, tithi: "तृतीया"))
+                    CalendarDayCellView(dayInfo: .init(nepaliDay: "४", englishDay: 18, date: prevMonthDay, isCurrentMonth: false, isHoliday: false, event: nil, tithi: "चतुर्थी"))
                 }
             }
         }

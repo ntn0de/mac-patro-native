@@ -20,4 +20,11 @@ extension CalendarViewModel {
         }
         return getTodayEvent(date: nepaliDate)
     }
+
+    func tithi(for date: Date) -> String? {
+        guard let nepaliDate = DateConverter.toNepaliDate(from: date) else {
+            return nil
+        }
+        return getTodayTithi(date: nepaliDate)
+    }
 }

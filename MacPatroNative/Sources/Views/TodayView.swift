@@ -28,6 +28,12 @@ public struct TodayView: View {
                         .font(.headline)
                         .fontWeight(.medium)
                         .foregroundStyle(.secondary)
+                    if let tithi = viewModel.tithi {
+                        Text(tithi)
+                            .font(.headline)
+                            .fontWeight(.light)
+                            .foregroundStyle(.secondary)
+                    }
                     if let event = viewModel.event {
                         Text(event)
                             .font(.headline)
@@ -71,6 +77,7 @@ public class TodayViewModel: ObservableObject {
     @Published public var fullDateString: String = ""
     @Published public var isHoliday: Bool = false
     @Published public var event: String?
+    @Published public var tithi: String?
 
     private var calendarViewModel: CalendarViewModel
     private var cancellables = Set<AnyCancellable>()
@@ -88,6 +95,17 @@ public class TodayViewModel: ObservableObject {
                 self?.fetchData()
             }
             .store(in: &cancellables)
+
+        // Subscribe to today's data changes from the calendar view model
+        calendarViewModel.$todayYearData
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                #if DEBUG
+                print("TodayViewModel received todayYearData update. Refreshing.")
+                #endif
+                self?.fetchData()
+            }
+            .store(in: &cancellables)
     }
 
     public func fetchData(for date: Date = Date()) {
@@ -101,6 +119,7 @@ public class TodayViewModel: ObservableObject {
         
         self.isHoliday = calendarViewModel.isHolidayOrSaturday(date: date)
         self.event = calendarViewModel.event(for: date)
+        self.tithi = calendarViewModel.tithi(for: date)
     }
     
     public func goToToday() {

@@ -19,6 +19,7 @@ public struct MonthData: Codable {
 public struct DayData: Codable {
     public let isHoliday: Bool
     public let event: String
+    public let tithi: String?
     public let day: String
     public let dayInEn: String
     public let en: String
