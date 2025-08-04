@@ -45,12 +45,16 @@ public struct SettingsView: View {
             
             Spacer()
             
+            CheckForUpdatesView()
+            
+            Spacer()
+            
             Button("Close") {
                 dismiss()
             }
             .keyboardShortcut(.defaultAction)
         }
         .padding()
-        .frame(width: 300, height: 150)
+        .frame(width: 300, height: 200)
     }
 }

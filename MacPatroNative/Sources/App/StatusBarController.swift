@@ -12,7 +12,7 @@ class StatusBarController: NSObject, NSPopoverDelegate {
     private var mainView: MainView
     private var eventMonitor: EventMonitor?
     private var aboutWindow: NSWindow?
-    private var settingsWindow: NSWindow?
+    private var settingsWindowController = SettingsWindowController()
 
     override init() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -108,19 +108,7 @@ class StatusBarController: NSObject, NSPopoverDelegate {
     }
 
     @objc func openSettings() {
-        if settingsWindow == nil {
-            let settingsView = SettingsView()
-            let hostingController = NSHostingController(rootView: settingsView)
-            let window = NSWindow(contentViewController: hostingController)
-            window.title = "Settings"
-            window.isReleasedWhenClosed = false
-            window.level = .floating
-            settingsWindow = window
-        }
-        
-        NSApp.activate(ignoringOtherApps: true)
-        settingsWindow?.makeKeyAndOrderFront(nil)
-        settingsWindow?.orderFrontRegardless()
+        settingsWindowController.openSettings()
     }
 }
 

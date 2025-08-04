@@ -1,0 +1,62 @@
+import Foundation
+
+public class UpdateService: ObservableObject {
+    
+    public static let shared = UpdateService()
+    
+    private let owner = "ntn0de"
+    private let repo = "mac-patro-native"
+    
+    @Published public var updateAvailable: Bool = false
+    @Published public var updateMessage = ""
+    @Published public var releaseURL: String?
+    
+    private init() {}
+    
+    public func checkForUpdates() {
+        let url = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases/latest")!
+        
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                DispatchQueue.main.async {
+                    self.updateMessage = "Error: \(error.localizedDescription)"
+                }
+                return
+            }
+            
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    self.updateMessage = "Error: No data received"
+                }
+                return
+            }
+            
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                   let tagName = json["tag_name"] as? String,
+                    let htmlURL = json["html_url"] as? String {
+                    let latestVersion = tagName
+                    let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+                    
+                    if latestVersion > currentVersion {
+                        DispatchQueue.main.async {
+                            self.updateAvailable = true
+                            self.updateMessage = "A new version (\(latestVersion)) is available."
+                            self.releaseURL = htmlURL
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            self.updateMessage = "You are up-to-date."
+                        }
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.updateMessage = "Error: \(error.localizedDescription)"
+                }
+            }
+        }
+        
+        task.resume()
+    }
+}
