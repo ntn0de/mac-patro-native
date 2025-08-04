@@ -41,12 +41,12 @@ public class UpdateService: ObservableObject {
                     if latestVersion > currentVersion {
                         DispatchQueue.main.async {
                             self.updateAvailable = true
-                            self.updateMessage = "A new version (\(latestVersion)) is available."
+                            self.updateMessage = "You have v\(currentVersion). Version \(latestVersion) is available."
                             self.releaseURL = htmlURL
                         }
                     } else {
                         DispatchQueue.main.async {
-                            self.updateMessage = "You are up-to-date."
+                            self.updateMessage = "You are up-to-date (v\(currentVersion))."
                         }
                     }
                 }
