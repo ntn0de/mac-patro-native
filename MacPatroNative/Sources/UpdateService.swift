@@ -35,10 +35,14 @@ public class UpdateService: ObservableObject {
                 if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                    let tagName = json["tag_name"] as? String,
                     let htmlURL = json["html_url"] as? String {
-                    let latestVersion = tagName
-                    let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+                    var latestVersion = tagName
+                    if latestVersion.hasPrefix("v") {
+                        latestVersion.removeFirst()
+                    }
                     
-                    if latestVersion > currentVersion {
+                    let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.6"
+                    
+                    if latestVersion.compare(currentVersion, options: .numeric) == .orderedDescending {
                         DispatchQueue.main.async {
                             self.updateAvailable = true
                             self.updateMessage = "You have v\(currentVersion). Version \(latestVersion) is available."
