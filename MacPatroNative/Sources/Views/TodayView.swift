@@ -3,6 +3,7 @@ import Combine
 
 public struct TodayView: View {
     @ObservedObject var viewModel: TodayViewModel
+    @ObservedObject private var settings = SettingsService.shared
 
     public init(viewModel: TodayViewModel = TodayViewModel()) {
         self.viewModel = viewModel
@@ -28,6 +29,11 @@ public struct TodayView: View {
                         .font(.headline)
                         .fontWeight(.medium)
                         .foregroundStyle(.secondary)
+                    if settings.showNepalTime {
+                        Text(viewModel.nepalTimeString)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     if let tithi = viewModel.tithi {
                         Text(tithi)
                             .font(.headline)
@@ -53,7 +59,10 @@ public struct TodayView: View {
             alignment: .bottom
         )
         .onAppear {
-            viewModel.fetchData()
+            viewModel.onAppear()
+        }
+        .onDisappear {
+            viewModel.onDisappear()
         }
     }
 }
@@ -71,6 +80,7 @@ public struct TodayView: View {
 }
 
 public class TodayViewModel: ObservableObject {
+    @ObservedObject private var settings = SettingsService.shared
     @Published public var nepaliDay: String = ""
     @Published public var nepaliMonth: String = ""
     @Published public var nepaliYear: String = ""
@@ -78,13 +88,23 @@ public class TodayViewModel: ObservableObject {
     @Published public var isHoliday: Bool = false
     @Published public var event: String?
     @Published public var tithi: String?
+    @Published public var nepalTimeString: String = ""
 
     private var calendarViewModel: CalendarViewModel
     private var cancellables = Set<AnyCancellable>()
+    private var timer: Timer?
 
     public init(calendarViewModel: CalendarViewModel = CalendarViewModel()) {
         self.calendarViewModel = calendarViewModel
         fetchData()
+        
+        if settings.showNepalTime {
+            updateNepalTime()
+            
+            timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+                self?.updateNepalTime()
+            }
+        }
         
         // Subscribe to the centralized day change publisher
         DateChangeService.shared.dayDidChange
@@ -109,7 +129,8 @@ public class TodayViewModel: ObservableObject {
     }
 
     public func fetchData(for date: Date = Date()) {
-        let nepaliDate = DateConverter.gregorianToBikramSambat(date: date)
+        let today = date
+        let nepaliDate = DateConverter.gregorianToBikramSambat(date: today)
         self.nepaliDay = NumberFormatter.nepaliString(from: nepaliDate.bsDay)
         self.nepaliMonth = NepaliMonth(rawValue: nepaliDate.bsMonth)?.name ?? ""
         self.nepaliYear = NumberFormatter.nepaliString(from: nepaliDate.bsYear)
@@ -117,13 +138,35 @@ public class TodayViewModel: ObservableObject {
         let dayOfWeek = LocalizationService.shared.nepaliDay(for: nepaliDate.dayOfWeek)
         self.fullDateString = "\(dayOfWeek) \(self.nepaliDay), \(self.nepaliMonth) \(self.nepaliYear)"
         
-        self.isHoliday = calendarViewModel.isHolidayOrSaturday(date: date)
-        self.event = calendarViewModel.event(for: date)
-        self.tithi = calendarViewModel.tithi(for: date)
+        let info = calendarViewModel.getInfo(for: today)
+        self.isHoliday = info.isHoliday
+        self.event = info.event
+        self.tithi = info.tithi
     }
     
     public func goToToday() {
         calendarViewModel.goToToday()
+    }
+
+    
+    public func onAppear() {
+        fetchData()
+    }
+
+    public func onDisappear() {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    private func updateNepalTime() {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd hh:mm:ss a 'NPT'"
+        formatter.timeZone = TimeZone(identifier: "Asia/Kathmandu")
+        nepalTimeString = formatter.string(from: Date())
+    }
+    
+    deinit {
+        timer?.invalidate()
     }
 }
 

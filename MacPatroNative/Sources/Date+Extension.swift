@@ -2,6 +2,6 @@ import Foundation
 
 extension Date {
     func isSaturday() -> Bool {
-        return Calendar.current.component(.weekday, from: self) == 7
+        return Calendar.nepal.component(.weekday, from: self) == 7
     }
 }

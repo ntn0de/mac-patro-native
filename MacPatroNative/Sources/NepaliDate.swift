@@ -15,6 +15,7 @@ public struct NepaliDate: CustomStringConvertible {
         let date = DateConverter.toGregorianDate(from: self)!
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "EEEE"
+        dateFormatter.timeZone = TimeZone(identifier: "Asia/Kathmandu")
         return dateFormatter.string(from: date)
     }
 

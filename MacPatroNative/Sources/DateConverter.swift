@@ -49,6 +49,7 @@ public final class DateConverter {
     public static func formatEnglishDate(date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "d MMMM yyyy"
+        formatter.timeZone = TimeZone(identifier: "Asia/Kathmandu")
         return formatter.string(from: date)
     }
 

@@ -5,9 +5,9 @@ public struct CalendarDayCellView: View {
     @State private var isHovering = false
     @State private var showingPopover = false
     
-    private var isToday: Bool { Calendar.current.isDateInToday(dayInfo.date) }
+    private var isToday: Bool { Calendar.nepal.isDateInToday(dayInfo.date) }
     // Only Saturday is a weekend holiday in Nepal
-    private var isSaturday: Bool { Calendar.current.component(.weekday, from: dayInfo.date) == 7 }
+    private var isSaturday: Bool { Calendar.nepal.component(.weekday, from: dayInfo.date) == 7 }
 
     public init(dayInfo: CalendarCellInfo) {
         self.dayInfo = dayInfo
@@ -77,9 +77,9 @@ public struct CalendarDayCellView: View {
 struct CalendarDayCellView_Previews: PreviewProvider {
     static var previews: some View {
         let today = Date()
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today)!
-        let weekend = Calendar.current.nextWeekend(startingAfter: today)!.start
-        let prevMonthDay = Calendar.current.date(byAdding: .month, value: -1, to: today)!
+        let tomorrow = Calendar.nepal.date(byAdding: .day, value: 1, to: today)!
+        let weekend = Calendar.nepal.nextWeekend(startingAfter: today)!.start
+        let prevMonthDay = Calendar.nepal.date(byAdding: .month, value: -1, to: today)!
 
         return ZStack {
 //            Color.black.ignoresSafeArea()

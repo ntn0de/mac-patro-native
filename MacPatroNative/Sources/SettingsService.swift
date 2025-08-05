@@ -50,11 +50,20 @@ public class SettingsService: ObservableObject {
         }
     }
 
+    @Published public var showNepalTime: Bool {
+        didSet {
+            UserDefaults.standard.set(showNepalTime, forKey: "showNepalTime")
+            settingsChangedPublisher.send()
+        }
+    }
+
     private init() {
         let savedFormat = UserDefaults.standard.string(forKey: "menuBarDateFormat") ?? DateFormat.dayMonth.rawValue
         self.dateFormat = DateFormat(rawValue: savedFormat) ?? .dayMonth
 
         let savedSeparator = UserDefaults.standard.string(forKey: "menuBarSeparator") ?? Separator.space.rawValue
         self.separator = Separator(rawValue: savedSeparator) ?? .space
+        
+        self.showNepalTime = UserDefaults.standard.bool(forKey: "showNepalTime")
     }
 }

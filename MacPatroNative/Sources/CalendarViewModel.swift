@@ -92,18 +92,18 @@ public class CalendarViewModel: ObservableObject {
         // 1. Get first day of Nepali month and its weekday
         let firstDayOfMonth = NepaliDate(bsYear: nepaliDate.bsYear, bsMonth: nepaliDate.bsMonth, bsDay: 1)
         guard let firstGregorianOfMonth = DateConverter.toGregorianDate(from: firstDayOfMonth) else { return }
-        let firstWeekday = Calendar.current.component(.weekday, from: firstGregorianOfMonth) // 1 = Sun
+        let firstWeekday = Calendar.nepal.component(.weekday, from: firstGregorianOfMonth) // 1 = Sun
         
         // 2. Pad with previous month's days
         let daysToPad = firstWeekday - 1
         if daysToPad > 0 {
             for i in (0..<daysToPad).reversed() {
-                if let prevDayGregorian = Calendar.current.date(byAdding: .day, value: -(i+1), to: firstGregorianOfMonth) {
+                if let prevDayGregorian = Calendar.nepal.date(byAdding: .day, value: -(i+1), to: firstGregorianOfMonth) {
                     let prevDayNepali = DateConverter.gregorianToBikramSambat(date: prevDayGregorian)
                     calendarDays.append(
                         CalendarCellInfo(
                             nepaliDay: NumberFormatter.nepaliString(from: prevDayNepali.bsDay),
-                            englishDay: Calendar.current.component(.day, from: prevDayGregorian),
+                            englishDay: Calendar.nepal.component(.day, from: prevDayGregorian),
                             date: prevDayGregorian,
                             isCurrentMonth: false,
                             isHoliday: isHoliday(date: prevDayNepali),
@@ -122,7 +122,7 @@ public class CalendarViewModel: ObservableObject {
                 calendarDays.append(
                     CalendarCellInfo(
                         nepaliDay: NumberFormatter.nepaliString(from: day),
-                        englishDay: Calendar.current.component(.day, from: currentGregorianDate),
+                        englishDay: Calendar.nepal.component(.day, from: currentGregorianDate),
                         date: currentGregorianDate,
                         isCurrentMonth: true,
                         isHoliday: isHoliday(date: currentNepaliDate),
@@ -136,14 +136,14 @@ public class CalendarViewModel: ObservableObject {
         // 4. Pad with next month's days
         let totalDays = 42
         let remainingDays = totalDays - calendarDays.count
-        if let nextMonthStartDate = Calendar.current.date(byAdding: .day, value: daysInMonth, to: firstGregorianOfMonth) {
+        if let nextMonthStartDate = Calendar.nepal.date(byAdding: .day, value: daysInMonth, to: firstGregorianOfMonth) {
             for i in 0..<remainingDays {
-                if let nextDayGregorian = Calendar.current.date(byAdding: .day, value: i, to: nextMonthStartDate) {
+                if let nextDayGregorian = Calendar.nepal.date(byAdding: .day, value: i, to: nextMonthStartDate) {
                     let nextDayNepali = DateConverter.gregorianToBikramSambat(date: nextDayGregorian)
                     calendarDays.append(
                         CalendarCellInfo(
                             nepaliDay: NumberFormatter.nepaliString(from: nextDayNepali.bsDay),
-                            englishDay: Calendar.current.component(.day, from: nextDayGregorian),
+                            englishDay: Calendar.nepal.component(.day, from: nextDayGregorian),
                             date: nextDayGregorian,
                             isCurrentMonth: false,
                             isHoliday: isHoliday(date: nextDayNepali),
@@ -210,6 +210,7 @@ public class CalendarViewModel: ObservableObject {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM"
+        dateFormatter.timeZone = TimeZone(identifier: "Asia/Kathmandu")
         
         let firstMonthName = dateFormatter.string(from: firstGregorian)
         let lastMonthName = dateFormatter.string(from: lastGregorian)
@@ -222,12 +223,12 @@ public class CalendarViewModel: ObservableObject {
     }
     
     func goToNextMonth() {
-        date = Calendar.current.date(byAdding: .month, value: 1, to: date)!
+        date = Calendar.nepal.date(byAdding: .month, value: 1, to: date)!
         fetchAndGenerateCalendar()
     }
     
     func goToPreviousMonth() {
-        date = Calendar.current.date(byAdding: .month, value: -1, to: date)!
+        date = Calendar.nepal.date(byAdding: .month, value: -1, to: date)!
         fetchAndGenerateCalendar()
     }
 
@@ -258,6 +259,22 @@ public class CalendarViewModel: ObservableObject {
                 }
             }
         }
+    }
+    public func getInfo(for date: Date) -> (isHoliday: Bool, event: String?, tithi: String?) {
+        let nepaliDate = DateConverter.toNepaliDate(from: date)!
+        let isToday = Calendar.nepal.isDateInToday(date)
+        
+        let yearDataToUse = isToday ? todayYearData : yearData
+        
+        guard let dayData = getDayData(for: nepaliDate, from: yearDataToUse) else {
+            return (date.isSaturday(), nil, nil)
+        }
+        
+        let isHoliday = dayData.isHoliday || date.isSaturday()
+        let event = (dayData.event.isEmpty || dayData.event == "--") ? nil : dayData.event
+        let tithi = (dayData.tithi?.isEmpty ?? true) ? nil : dayData.tithi
+        
+        return (isHoliday, event, tithi)
     }
 }
 

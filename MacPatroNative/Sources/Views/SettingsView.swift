@@ -41,6 +41,8 @@ public struct SettingsView: View {
                         Text(separator.nepaliName).tag(separator)
                     }
                 }
+                
+                Toggle("Show Nepal Time", isOn: $settings.showNepalTime)
             }
             
             Spacer()
