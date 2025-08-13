@@ -15,7 +15,7 @@ public class CalendarViewModel: ObservableObject {
     private var dataService: DataServiceProtocol
     private var cancellables = Set<AnyCancellable>()
     
-    public init(date: Date = Date(), dataService: DataServiceProtocol = DataService()) {
+    public init(date: Date = Calendar.currentDateForNepalConversion, dataService: DataServiceProtocol = DataService()) {
         self.date = date
         self.dataService = dataService
         fetchAndGenerateCalendar()
@@ -233,7 +233,7 @@ public class CalendarViewModel: ObservableObject {
     }
 
     func goToToday() {
-        date = Date()
+        date = Calendar.currentDateForNepalConversion
         fetchAndGenerateCalendar()
     }
 
@@ -245,7 +245,7 @@ public class CalendarViewModel: ObservableObject {
     }
 
     private func loadTodayData() {
-        let todayNepali = DateConverter.toNepaliDate(from: Date())!
+        let todayNepali = DateConverter.toNepaliDate(from: Calendar.currentDateForNepalConversion)!
         dataService.loadData(forYear: todayNepali.bsYear, bundle: .main) { result in
             DispatchQueue.main.async {
                 switch result {

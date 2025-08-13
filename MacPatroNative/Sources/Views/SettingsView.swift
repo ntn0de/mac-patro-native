@@ -1,4 +1,5 @@
 import SwiftUI
+import LaunchAtLogin
 
 public struct SettingsView: View {
     @ObservedObject private var settings = SettingsService.shared
@@ -9,7 +10,7 @@ public struct SettingsView: View {
     private let year: String
 
     public init() {
-        let today = DateConverter.toNepaliDate(from: Date())!
+        let today = DateConverter.toNepaliDate(from: Calendar.currentDateForNepalConversion)!
         self.day = NumberFormatter.nepaliString(from: today.bsDay)
         self.month = NepaliMonth(rawValue: today.bsMonth)!.name
         self.year = NumberFormatter.nepaliString(from: today.bsYear)
@@ -43,6 +44,7 @@ public struct SettingsView: View {
                 }
                 
                 Toggle("Show Nepal Time", isOn: $settings.showNepalTime)
+                LaunchAtLogin.Toggle()
             }
             
             Spacer()
@@ -57,6 +59,6 @@ public struct SettingsView: View {
             .keyboardShortcut(.defaultAction)
         }
         .padding()
-        .frame(width: 300, height: 200)
+        .frame(width: 300, height: 300)
     }
 }

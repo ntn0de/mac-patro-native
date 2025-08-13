@@ -45,7 +45,7 @@ public class MenuBarViewModel: ObservableObject {
     }
 
     private func updateMenuBarText() {
-        let nepaliDate = DateConverter.toNepaliDate(from: Date())!
+        let nepaliDate = DateConverter.toNepaliDate(from: Calendar.currentDateForNepalConversion)!
         let day = NumberFormatter.nepaliString(from: nepaliDate.bsDay)
         let month = NepaliMonth(rawValue: nepaliDate.bsMonth)!.name
         let year = NumberFormatter.nepaliString(from: nepaliDate.bsYear)

@@ -128,7 +128,7 @@ public class TodayViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    public func fetchData(for date: Date = Date()) {
+    public func fetchData(for date: Date = Calendar.currentDateForNepalConversion) {
         let today = date
         let nepaliDate = DateConverter.gregorianToBikramSambat(date: today)
         self.nepaliDay = NumberFormatter.nepaliString(from: nepaliDate.bsDay)
@@ -162,7 +162,8 @@ public class TodayViewModel: ObservableObject {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd hh:mm:ss a 'NPT'"
         formatter.timeZone = TimeZone(identifier: "Asia/Kathmandu")
-        nepalTimeString = formatter.string(from: Date())
+        let currentDate = Date()
+        nepalTimeString = formatter.string(from: currentDate)
     }
     
     deinit {

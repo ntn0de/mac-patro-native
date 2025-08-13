@@ -1,8 +1,13 @@
 
 import Foundation
+import Combine
 @testable import MacPatroKit
 
 class MockDataService: DataServiceProtocol {
+    var dataDidUpdate: AnyPublisher<Void, Never> {
+        return PassthroughSubject<Void, Never>().eraseToAnyPublisher()
+    }
+    
     var yearData: YearData?
     var error: Error?
 

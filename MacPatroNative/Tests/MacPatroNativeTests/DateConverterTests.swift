@@ -1,6 +1,6 @@
 
 import XCTest
-@testable import MacPatroNative
+@testable import MacPatroKit
 
 final class DateConverterTests: XCTestCase {
 
