@@ -173,6 +173,22 @@ The automated workflow requires a secret to be set in your repository to securel
 5.  For the **Name**, enter `REMOTE_URL`.
 6.  For the **Secret**, paste your full data source URL (e.g., `https://your-data-source.com/year/`).
 7.  Click **Add secret**.
+### How to Release
+
+To create a new release, you simply need to create and push a new Git tag. The automated workflow will handle the rest.
+
+1.  **Create a new tag:**
+    Replace `v1.0.1` with your desired version number.
+    ```bash
+    git tag v1.0.1
+    ```
+
+2.  **Push the tag to GitHub:**
+    ```bash
+    git push origin v1.0.1
+    ```
+
+This will trigger the GitHub Actions workflow, which will build and release the new version of the application.
 
 
 ## License
