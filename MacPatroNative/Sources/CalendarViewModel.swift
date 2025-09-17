@@ -223,12 +223,14 @@ public class CalendarViewModel: ObservableObject {
     }
     
     func goToNextMonth() {
-        date = Calendar.nepal.date(byAdding: .month, value: 1, to: date)!
+        guard let monthInterval = Calendar.nepal.dateInterval(of: .month, for: date) else { return }
+        date = Calendar.nepal.date(byAdding: .month, value: 1, to: monthInterval.start)!
         fetchAndGenerateCalendar()
     }
     
     func goToPreviousMonth() {
-        date = Calendar.nepal.date(byAdding: .month, value: -1, to: date)!
+        guard let monthInterval = Calendar.nepal.dateInterval(of: .month, for: date) else { return }
+        date = Calendar.nepal.date(byAdding: .month, value: -1, to: monthInterval.start)!
         fetchAndGenerateCalendar()
     }
 
