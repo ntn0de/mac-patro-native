@@ -40,7 +40,7 @@ public class UpdateService: ObservableObject {
                         latestVersion.removeFirst()
                     }
                     
-                    let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.9"
+                    let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.10"
                     
                     if latestVersion.compare(currentVersion, options: .numeric) == .orderedDescending {
                         DispatchQueue.main.async {
