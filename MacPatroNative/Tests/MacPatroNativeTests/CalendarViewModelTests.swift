@@ -38,8 +38,24 @@ final class CalendarViewModelTests: XCTestCase {
         let holidayDateInfo = viewModel.getInfo(for: holidayDate)
         XCTAssertTrue(holidayDateInfo.isHoliday)
     }
+
+    func testForceRefreshBypassesCache() {
+        let expectation = self.expectation(description: "Force refresh bypasses cache")
+
+        mockDataService.yearData = YearData(lastUpdatedAt: 0, data: [MonthData(month: 4, days: [DayData(isHoliday: false, event: "", tithi: "tithi", day: "10", dayInEn: "25", en: "July")])])
+
+        viewModel.forceRefresh()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertEqual(self.mockDataService.lastIgnoringCache, true)
+            expectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 1)
+    }
     
     static var allTests = [
         ("testGetInfo", testGetInfo),
+        ("testForceRefreshBypassesCache", testForceRefreshBypassesCache),
     ]
 }

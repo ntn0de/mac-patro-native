@@ -68,4 +68,29 @@ final class DataServiceTests: XCTestCase {
         
         waitForExpectations(timeout: 1, handler: nil)
     }
+
+    func testDayDataDecodesWhenEventIsMissing() throws {
+        let json = """
+        {
+          "last_updated_at": 1775921371817,
+          "data": [
+            {
+              "month": 1,
+              "days": [
+                {
+                  "isHoliday": false,
+                  "day": "३",
+                  "dayInEn": "3",
+                  "en": "16"
+                }
+              ]
+            }
+          ]
+        }
+        """.data(using: .utf8)!
+
+        let decoded = try JSONDecoder().decode(YearData.self, from: json)
+
+        XCTAssertEqual(decoded.data.first?.days.first?.event, "")
+    }
 }

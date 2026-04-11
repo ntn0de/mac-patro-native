@@ -242,13 +242,30 @@ public class CalendarViewModel: ObservableObject {
     public func forceRefresh() {
         self.yearData = nil
         self.todayYearData = nil
-        fetchAndGenerateCalendar()
-        loadTodayData()
+
+        let viewedNepaliDate = DateConverter.toNepaliDate(from: date)!
+        currentYear = viewedNepaliDate.bsYear
+        dataService.loadData(forYear: viewedNepaliDate.bsYear, bundle: .main, ignoringCache: true) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let yearData):
+                    self.yearData = yearData
+                case .failure(let error):
+                    #if DEBUG
+                    print("Failed to force refresh viewed year data: \(error)")
+                    #endif
+                    self.yearData = nil
+                }
+                self.generateCalendar()
+            }
+        }
+
+        loadTodayData(ignoringCache: true)
     }
 
-    private func loadTodayData() {
+    private func loadTodayData(ignoringCache: Bool = false) {
         let todayNepali = DateConverter.toNepaliDate(from: Calendar.currentDateForNepalConversion)!
-        dataService.loadData(forYear: todayNepali.bsYear, bundle: .main) { result in
+        dataService.loadData(forYear: todayNepali.bsYear, bundle: .main, ignoringCache: ignoringCache) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let yearData):

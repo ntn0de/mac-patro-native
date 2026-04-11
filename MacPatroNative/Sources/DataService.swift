@@ -40,22 +40,19 @@ public final class DataService: DataServiceProtocol {
         return true
     }
     
-    public func loadData(forYear year: Int, bundle: Bundle = .main, completion: @escaping (Result<YearData, Error>) -> Void) {
+    public func loadData(forYear year: Int, bundle: Bundle = .main, ignoringCache: Bool = false, completion: @escaping (Result<YearData, Error>) -> Void) {
         log("Requesting data for year: \(year)")
 
         // 1. Check for cached data first
-        if let cacheURL = cacheFileURL(forYear: year), let data = try? Data(contentsOf: cacheURL) {
-            log("Cache hit for year \(year).")
-            do {
-                let calendarYear = try JSONDecoder().decode(YearData.self, from: data)
-                completion(.success(calendarYear))
+        if !ignoringCache {
+            if let cachedData = loadCachedData(forYear: year) {
+                completion(.success(cachedData))
                 // After returning cached data, check for updates in the background.
-                checkForUpdates(forYear: year, cachedData: calendarYear)
+                checkForUpdates(forYear: year, cachedData: cachedData)
                 return
-            } catch {
-                log("Corrupted cache for year \(year). Deleting and fetching fresh.")
-                try? FileManager.default.removeItem(at: cacheURL)
             }
+        } else {
+            log("Ignoring cache for year \(year). Fetching fresh data.")
         }
 
         // 2. If no cache, fetch from remote, with fallback to bundled
@@ -71,15 +68,38 @@ public final class DataService: DataServiceProtocol {
                         }
                         completion(.success(remoteYearData))
                     } else {
-                        // If validation fails, treat it like a remote error and use bundled data.
-                        self.loadBundledData(forYear: year, bundle: bundle, completion: completion)
+                        self.loadFallbackData(forYear: year, bundle: bundle, ignoringCache: ignoringCache, completion: completion)
                     }
                 case .failure:
                     log("Remote fetch failed for year \(year). Falling back to bundled data.")
-                    self.loadBundledData(forYear: year, bundle: bundle, completion: completion)
+                    self.loadFallbackData(forYear: year, bundle: bundle, ignoringCache: ignoringCache, completion: completion)
                 }
             }
         }
+    }
+
+    private func loadCachedData(forYear year: Int) -> YearData? {
+        guard let cacheURL = cacheFileURL(forYear: year), let data = try? Data(contentsOf: cacheURL) else {
+            return nil
+        }
+
+        log("Cache hit for year \(year).")
+        do {
+            return try JSONDecoder().decode(YearData.self, from: data)
+        } catch {
+            log("Corrupted cache for year \(year). Deleting and fetching fresh.")
+            try? FileManager.default.removeItem(at: cacheURL)
+            return nil
+        }
+    }
+
+    private func loadFallbackData(forYear year: Int, bundle: Bundle, ignoringCache: Bool, completion: @escaping (Result<YearData, Error>) -> Void) {
+        if ignoringCache, let cachedData = loadCachedData(forYear: year) {
+            completion(.success(cachedData))
+            return
+        }
+
+        loadBundledData(forYear: year, bundle: bundle, completion: completion)
     }
     
     private func loadBundledData(forYear year: Int, bundle: Bundle, completion: @escaping (Result<YearData, Error>) -> Void) {

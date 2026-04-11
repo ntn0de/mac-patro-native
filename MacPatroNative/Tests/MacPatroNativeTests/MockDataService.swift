@@ -10,8 +10,10 @@ class MockDataService: DataServiceProtocol {
     
     var yearData: YearData?
     var error: Error?
+    var lastIgnoringCache: Bool?
 
-    func loadData(forYear year: Int, bundle: Bundle, completion: @escaping (Result<YearData, Error>) -> Void) {
+    func loadData(forYear year: Int, bundle: Bundle, ignoringCache: Bool, completion: @escaping (Result<YearData, Error>) -> Void) {
+        lastIgnoringCache = ignoringCache
         if let error = error {
             completion(.failure(error))
         } else if let yearData = yearData {
