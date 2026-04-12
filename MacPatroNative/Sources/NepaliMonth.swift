@@ -1,6 +1,6 @@
 import Foundation
 
-enum NepaliMonth: Int {
+enum NepaliMonth: Int, CaseIterable {
     case Baisakh = 1, Jestha, Ashadh, Shrawan, Bhadra, Ashwin, Kartik, Mangsir, Poush, Magh, Falgun, Chaitra
 
     var name: String {

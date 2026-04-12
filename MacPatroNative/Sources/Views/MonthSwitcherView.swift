@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 public struct MonthSwitcherView: View {
     @ObservedObject var viewModel: CalendarViewModel
@@ -29,6 +30,13 @@ public struct MonthSwitcherView: View {
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
+            .onHover { hovering in
+                if hovering {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pop()
+                }
+            }
             
             Button(action: {
                 viewModel.goToNextMonth()
@@ -39,6 +47,13 @@ public struct MonthSwitcherView: View {
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
+            .onHover { hovering in
+                if hovering {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pop()
+                }
+            }
         }
     }
 }

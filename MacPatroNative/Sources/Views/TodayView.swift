@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import AppKit
 
 public struct TodayView: View {
     @ObservedObject private var viewModel: TodayViewModel
@@ -60,6 +61,13 @@ public struct TodayView: View {
         )
         .onAppear {
             viewModel.onAppear()
+        }
+        .onHover { hovering in
+            if hovering {
+                NSCursor.pointingHand.push()
+            } else {
+                NSCursor.pop()
+            }
         }
         .onDisappear {
             viewModel.onDisappear()

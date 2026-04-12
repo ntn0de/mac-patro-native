@@ -10,6 +10,8 @@ The easiest way to install Mac Patro is to download the latest release from the 
 2.  Download the `.dmg` file from the latest release.
 3.  Open the `.dmg` file and drag `Mac Patro.app` to your `Applications` folder.
 
+If macOS says the app is damaged or should be moved to the Trash, see the **Troubleshooting** section below.
+
 
 ## Troubleshooting
 
@@ -22,6 +24,8 @@ xattr -cr /Applications/Mac\ Patro.app
 ```
 
 After running the command, you should be able to open the app.
+
+If you already have Mac Patro open, the same command is also shown inside the app under **Settings → Check for Updates** and **About**.
 
 
 ## Building from Source

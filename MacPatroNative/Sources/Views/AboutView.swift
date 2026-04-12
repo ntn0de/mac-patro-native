@@ -1,8 +1,10 @@
 
 import SwiftUI
+import AppKit
 
 public struct AboutView: View {
     @Environment(\.dismiss) var dismiss
+    private let quarantineCommand = "xattr -cr /Applications/Mac\\ Patro.app"
 
     public init() {}
     public var body: some View {
@@ -17,6 +19,22 @@ public struct AboutView: View {
                 .font(.caption)
             Spacer()
             Text("A simple Nepali calendar app for macOS.").multilineTextAlignment(.center)
+            DisclosureGroup("If macOS blocks opening") {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Run this command in Terminal:")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(quarantineCommand)
+                        .font(.caption.monospaced())
+                        .textSelection(.enabled)
+                    Button("Copy Command") {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(quarantineCommand, forType: .string)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.top, 4)
+            }
             Spacer()
             Button("Close") {
                 dismiss()
@@ -24,7 +42,6 @@ public struct AboutView: View {
             .keyboardShortcut(.defaultAction)
         }
         .padding()
-        .frame(width: 250, height: 200)
+        .frame(width: 320, height: 260)
     }
 }
-

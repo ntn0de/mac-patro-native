@@ -8,7 +8,6 @@ public struct CalendarDayCellView: View {
     private var isToday: Bool { Calendar.nepal.isDateInToday(dayInfo.date) }
     // Only Saturday is a weekend holiday in Nepal
     private var isSaturday: Bool { Calendar.nepal.component(.weekday, from: dayInfo.date) == 7 }
-
     public init(dayInfo: CalendarCellInfo) {
         self.dayInfo = dayInfo
     }
@@ -41,6 +40,12 @@ public struct CalendarDayCellView: View {
         .onHover { hovering in
             if dayInfo.isCurrentMonth {
                 isHovering = hovering
+            }
+
+            if hovering {
+                NSCursor.pointingHand.push()
+            } else {
+                NSCursor.pop()
             }
         }
         .onTapGesture {

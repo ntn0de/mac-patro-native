@@ -13,6 +13,7 @@ class StatusBarController: NSObject, NSPopoverDelegate {
     private var eventMonitor: EventMonitor?
     private var aboutWindow: NSWindow?
     private var settingsWindowController = SettingsWindowController()
+    private var dateConverterWindowController = DateConverterWindowController()
 
     override init() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -35,6 +36,10 @@ class StatusBarController: NSObject, NSPopoverDelegate {
         let forceUpdateMenuItem = NSMenuItem(title: "Force update year data", action: #selector(forceUpdate), keyEquivalent: "")
         forceUpdateMenuItem.target = self
         menu.addItem(forceUpdateMenuItem)
+
+        let dateConverterMenuItem = NSMenuItem(title: "Date Converter...", action: #selector(openDateConverter), keyEquivalent: "")
+        dateConverterMenuItem.target = self
+        menu.addItem(dateConverterMenuItem)
 
         let settingsMenuItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ",")
         settingsMenuItem.target = self
@@ -73,6 +78,7 @@ class StatusBarController: NSObject, NSPopoverDelegate {
                     let positioningRect = NSRect(x: 0, y: button.bounds.height + 12, width: button.bounds.width, height: 0)
                     NSApp.activate(ignoringOtherApps: true)
                     popover.show(relativeTo: positioningRect, of: button, preferredEdge: .minY)
+                    NotificationCenter.default.post(name: .calendarPopoverDidOpen, object: nil)
                     eventMonitor?.start()
                 }
             }
@@ -85,6 +91,7 @@ class StatusBarController: NSObject, NSPopoverDelegate {
     
     func popoverDidClose(_ notification: Notification) {
         eventMonitor?.stop()
+        NotificationCenter.default.post(name: .calendarPopoverDidClose, object: nil)
     }
 
     @objc func about() {
@@ -109,5 +116,9 @@ class StatusBarController: NSObject, NSPopoverDelegate {
 
     @objc func openSettings() {
         settingsWindowController.openSettings()
+    }
+
+    @objc func openDateConverter() {
+        dateConverterWindowController.openDateConverter()
     }
 }
