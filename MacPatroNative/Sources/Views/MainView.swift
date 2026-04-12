@@ -2,15 +2,23 @@ import SwiftUI
 import AppKit
 
 public struct MainView: View {
-    @StateObject public var viewModel = CalendarViewModel()
-    @StateObject private var menuBarViewModel = MenuBarViewModel()
+    @StateObject private var viewModel: CalendarViewModel
+    @StateObject private var todayViewModel: TodayViewModel
     @ObservedObject private var updateService = UpdateService.shared
     @State private var showUpdateBadge = false
     
     private let settingsWindowController = SettingsWindowController()
     private let updateDismissedKey = "updateDismissed"
     
-    public init() {}
+    public init() {
+        let calendarViewModel = CalendarViewModel()
+        _viewModel = StateObject(wrappedValue: calendarViewModel)
+        _todayViewModel = StateObject(wrappedValue: TodayViewModel(calendarViewModel: calendarViewModel))
+    }
+
+    public func forceRefresh() {
+        viewModel.forceRefresh()
+    }
     
     public var body: some View {
         VStack(spacing: 10) {
@@ -23,7 +31,7 @@ public struct MainView: View {
                     settingsWindowController.openSettings()
                 }
             }
-            TodayView(viewModel: TodayViewModel(calendarViewModel: viewModel))
+            TodayView(viewModel: todayViewModel)
             MonthSwitcherView(viewModel: viewModel)
             CalendarGridView(viewModel: viewModel)
             Spacer()

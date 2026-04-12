@@ -55,6 +55,9 @@ public final class DateConverter {
 
     public static func toNepaliDate(from gregorianDate: Date) -> NepaliDate? {
         let days = Int(floor((gregorianDate.timeIntervalSince1970 - bsEpoch) / msPerDay)) + 1
+        guard days > 0 else {
+            return nil
+        }
         
         var year = bsYearZero
         var month = 1
@@ -62,7 +65,9 @@ public final class DateConverter {
         var remainingDays = days
         
         while remainingDays > 0 {
-            let daysInMonth = self.daysInMonth(year: year, month: month)!
+            guard let daysInMonth = self.daysInMonth(year: year, month: month) else {
+                return nil
+            }
             if remainingDays > daysInMonth {
                 remainingDays -= daysInMonth
                 month += 1
@@ -75,5 +80,26 @@ public final class DateConverter {
             }
         }
         return nil
+    }
+
+    static func startOfNepaliMonth(for gregorianDate: Date, addingMonths monthOffset: Int = 0) -> Date? {
+        guard let nepaliDate = toNepaliDate(from: gregorianDate) else {
+            return nil
+        }
+
+        var year = nepaliDate.bsYear
+        var month = nepaliDate.bsMonth + monthOffset
+
+        while month > 12 {
+            month -= 12
+            year += 1
+        }
+
+        while month < 1 {
+            month += 12
+            year -= 1
+        }
+
+        return toGregorianDate(from: NepaliDate(bsYear: year, bsMonth: month, bsDay: 1))
     }
 }

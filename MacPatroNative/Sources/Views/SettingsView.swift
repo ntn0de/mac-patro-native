@@ -4,16 +4,24 @@ import LaunchAtLogin
 public struct SettingsView: View {
     @ObservedObject private var settings = SettingsService.shared
     @Environment(\.dismiss) var dismiss
+    private let calendarService: NepaliCalendarServing
 
     private let day: String
     private let month: String
     private let year: String
 
-    public init() {
-        let today = DateConverter.toNepaliDate(from: Calendar.currentDateForNepalConversion)!
-        self.day = NumberFormatter.nepaliString(from: today.bsDay)
-        self.month = NepaliMonth(rawValue: today.bsMonth)!.name
-        self.year = NumberFormatter.nepaliString(from: today.bsYear)
+    public init(calendarService: NepaliCalendarServing = NepaliCalendarService.shared) {
+        self.calendarService = calendarService
+
+        if let today = calendarService.currentDisplay() {
+            self.day = today.dayString
+            self.month = today.monthName
+            self.year = today.yearString
+        } else {
+            self.day = "-"
+            self.month = "-"
+            self.year = "-"
+        }
     }
 
     private func exampleString(for format: SettingsService.DateFormat) -> String {

@@ -57,5 +57,74 @@ final class DateConverterTests: XCTestCase {
             XCTAssertEqual(bsDate.bsDay, expectedBSDate[2])
         }
     }
+
+    func testNepaliMonthNavigationAcrossSupportedDates() {
+        let firstSupportedYear = 1970
+        let lastSupportedYear = 1970 + 117 - 1
+
+        for year in firstSupportedYear...lastSupportedYear {
+            for month in 1...12 {
+                guard let daysInMonth = DateConverter.daysInMonth(year: year, month: month) else {
+                    XCTFail("Missing month length for \(year)-\(month)")
+                    return
+                }
+
+                for day in 1...daysInMonth {
+                    let currentBsDate = NepaliDate(bsYear: year, bsMonth: month, bsDay: day)
+                    guard let currentGregDate = DateConverter.toGregorianDate(from: currentBsDate) else {
+                        XCTFail("Failed to convert \(currentBsDate) to Gregorian")
+                        return
+                    }
+
+                    if !(year == firstSupportedYear && month == 1) {
+                        let expectedPreviousMonth = month == 1
+                            ? NepaliDate(bsYear: year - 1, bsMonth: 12, bsDay: 1)
+                            : NepaliDate(bsYear: year, bsMonth: month - 1, bsDay: 1)
+
+                        guard let previousMonthStart = DateConverter.startOfNepaliMonth(for: currentGregDate, addingMonths: -1),
+                              let previousBsDate = DateConverter.toNepaliDate(from: previousMonthStart) else {
+                            XCTFail("Failed previous-month navigation for \(currentBsDate)")
+                            return
+                        }
+
+                        XCTAssertEqual(previousBsDate, expectedPreviousMonth, "Unexpected previous month from \(currentBsDate)")
+                    }
+
+                    if !(year == lastSupportedYear && month == 12) {
+                        let expectedNextMonth = month == 12
+                            ? NepaliDate(bsYear: year + 1, bsMonth: 1, bsDay: 1)
+                            : NepaliDate(bsYear: year, bsMonth: month + 1, bsDay: 1)
+
+                        guard let nextMonthStart = DateConverter.startOfNepaliMonth(for: currentGregDate, addingMonths: 1),
+                              let nextBsDate = DateConverter.toNepaliDate(from: nextMonthStart) else {
+                            XCTFail("Failed next-month navigation for \(currentBsDate)")
+                            return
+                        }
+
+                        XCTAssertEqual(nextBsDate, expectedNextMonth, "Unexpected next month from \(currentBsDate)")
+                    }
+                }
+            }
+        }
+    }
+
+    func testToNepaliDateReturnsNilForUnsupportedDates() {
+        let lowerOutOfRangeDate = Date(timeIntervalSince1970: -1789948800 - 86400)
+        XCTAssertNil(DateConverter.toNepaliDate(from: lowerOutOfRangeDate))
+
+        let upperOutOfRangeDate = try! XCTUnwrap(
+            Calendar(identifier: .gregorian).date(from: DateComponents(year: 2200, month: 1, day: 1))
+        )
+
+        XCTAssertNil(DateConverter.toNepaliDate(from: upperOutOfRangeDate))
+    }
+
+    func testNepaliCalendarServiceReturnsNilForUnsupportedDates() {
+        let service = NepaliCalendarService()
+        let unsupportedDate = Date(timeIntervalSince1970: -1789948800 - 86400)
+
+        XCTAssertNil(service.nepaliDate(from: unsupportedDate))
+        XCTAssertNil(service.display(for: unsupportedDate))
+    }
     
 }

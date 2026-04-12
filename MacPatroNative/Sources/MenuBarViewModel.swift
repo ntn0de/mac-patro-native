@@ -11,9 +11,11 @@ public class MenuBarViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private let settings = SettingsService.shared
     private let dataService: DataServiceProtocol
+    private let calendarService: NepaliCalendarServing
 
-    public init(dataService: DataServiceProtocol = DataService()) {
+    public init(dataService: DataServiceProtocol = DataService(), calendarService: NepaliCalendarServing = NepaliCalendarService.shared) {
         self.dataService = dataService
+        self.calendarService = calendarService
         updateMenuBarText()
         
         // Update whenever the settings change
@@ -45,26 +47,13 @@ public class MenuBarViewModel: ObservableObject {
     }
 
     private func updateMenuBarText() {
-        let nepaliDate = DateConverter.toNepaliDate(from: Calendar.currentDateForNepalConversion)!
-        let day = NumberFormatter.nepaliString(from: nepaliDate.bsDay)
-        let month = NepaliMonth(rawValue: nepaliDate.bsMonth)!.name
-        let year = NumberFormatter.nepaliString(from: nepaliDate.bsYear)
-        
-        var components: [String] = []
-        
-        switch settings.dateFormat {
-        case .day:
-            components.append(day)
-        case .dayMonth:
-            components.append(day)
-            components.append(month)
-        case .dayMonthYear:
-            components.append(day)
-            components.append(month)
-            components.append(year)
+        guard let display = calendarService.currentDisplay() else {
+            menuBarIconText = menuBarText
+            iconName = "1"
+            return
         }
-        
-        menuBarIconText = components.joined(separator: settings.separator.rawValue)
-        iconName = NumberFormatter.nepaliString(from: nepaliDate.bsDay)
+
+        menuBarIconText = calendarService.menuBarText(for: display, format: settings.dateFormat, separator: settings.separator)
+        iconName = display.dayString
     }
 }

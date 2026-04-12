@@ -41,3 +41,5 @@ dist/
 # Build artifacts
 default.profraw
 *.profraw
+.agents/
+skills-lock.json

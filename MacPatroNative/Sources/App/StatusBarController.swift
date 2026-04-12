@@ -104,11 +104,10 @@ class StatusBarController: NSObject, NSPopoverDelegate {
     }
 
     @objc func forceUpdate() {
-        mainView.viewModel.forceRefresh()
+        mainView.forceRefresh()
     }
 
     @objc func openSettings() {
         settingsWindowController.openSettings()
     }
 }
-

@@ -13,10 +13,12 @@ public class CalendarViewModel: ObservableObject {
     private var currentYear: Int = 0
     
     private var dataService: DataServiceProtocol
+    private let calendarService: NepaliCalendarServing
     private var cancellables = Set<AnyCancellable>()
     
-    public init(date: Date = Calendar.currentDateForNepalConversion, dataService: DataServiceProtocol = DataService()) {
-        self.date = date
+    public init(date: Date? = nil, dataService: DataServiceProtocol = DataService(), calendarService: NepaliCalendarServing = NepaliCalendarService.shared) {
+        self.calendarService = calendarService
+        self.date = date ?? calendarService.currentDateForConversion
         self.dataService = dataService
         fetchAndGenerateCalendar()
         
@@ -45,7 +47,14 @@ public class CalendarViewModel: ObservableObject {
     }
     
     private func fetchAndGenerateCalendar() {
-        let nepaliDate = DateConverter.toNepaliDate(from: date)!
+        guard let nepaliDate = calendarService.nepaliDate(from: date) else {
+            yearData = nil
+            days = []
+            monthYearString = ""
+            englishMonthRange = ""
+            return
+        }
+
         if self.yearData == nil || nepaliDate.bsYear != self.currentYear {
             #if DEBUG
             print("Year changed or no data. Fetching for \(nepaliDate.bsYear)")
@@ -76,8 +85,14 @@ public class CalendarViewModel: ObservableObject {
     }
     
     func generateCalendar() {
-        guard let nepaliDate = DateConverter.toNepaliDate(from: date),
-              let daysInMonth = DateConverter.daysInMonth(year: nepaliDate.bsYear, month: nepaliDate.bsMonth) else {
+        guard let nepaliDate = calendarService.nepaliDate(from: date) else {
+            days = []
+            monthYearString = ""
+            englishMonthRange = ""
+            return
+        }
+
+        guard let daysInMonth = DateConverter.daysInMonth(year: nepaliDate.bsYear, month: nepaliDate.bsMonth) else {
             return
         }
         
@@ -98,8 +113,8 @@ public class CalendarViewModel: ObservableObject {
         let daysToPad = firstWeekday - 1
         if daysToPad > 0 {
             for i in (0..<daysToPad).reversed() {
-                if let prevDayGregorian = Calendar.nepal.date(byAdding: .day, value: -(i+1), to: firstGregorianOfMonth) {
-                    let prevDayNepali = DateConverter.gregorianToBikramSambat(date: prevDayGregorian)
+                if let prevDayGregorian = Calendar.nepal.date(byAdding: .day, value: -(i+1), to: firstGregorianOfMonth),
+                   let prevDayNepali = DateConverter.toNepaliDate(from: prevDayGregorian) {
                     calendarDays.append(
                         CalendarCellInfo(
                             nepaliDay: NumberFormatter.nepaliString(from: prevDayNepali.bsDay),
@@ -138,8 +153,8 @@ public class CalendarViewModel: ObservableObject {
         let remainingDays = totalDays - calendarDays.count
         if let nextMonthStartDate = Calendar.nepal.date(byAdding: .day, value: daysInMonth, to: firstGregorianOfMonth) {
             for i in 0..<remainingDays {
-                if let nextDayGregorian = Calendar.nepal.date(byAdding: .day, value: i, to: nextMonthStartDate) {
-                    let nextDayNepali = DateConverter.gregorianToBikramSambat(date: nextDayGregorian)
+                if let nextDayGregorian = Calendar.nepal.date(byAdding: .day, value: i, to: nextMonthStartDate),
+                   let nextDayNepali = DateConverter.toNepaliDate(from: nextDayGregorian) {
                     calendarDays.append(
                         CalendarCellInfo(
                             nepaliDay: NumberFormatter.nepaliString(from: nextDayNepali.bsDay),
@@ -223,19 +238,19 @@ public class CalendarViewModel: ObservableObject {
     }
     
     func goToNextMonth() {
-        guard let monthInterval = Calendar.nepal.dateInterval(of: .month, for: date) else { return }
-        date = Calendar.nepal.date(byAdding: .month, value: 1, to: monthInterval.start)!
+        guard let nextMonthStart = DateConverter.startOfNepaliMonth(for: date, addingMonths: 1) else { return }
+        date = nextMonthStart
         fetchAndGenerateCalendar()
     }
     
     func goToPreviousMonth() {
-        guard let monthInterval = Calendar.nepal.dateInterval(of: .month, for: date) else { return }
-        date = Calendar.nepal.date(byAdding: .month, value: -1, to: monthInterval.start)!
+        guard let previousMonthStart = DateConverter.startOfNepaliMonth(for: date, addingMonths: -1) else { return }
+        date = previousMonthStart
         fetchAndGenerateCalendar()
     }
 
     func goToToday() {
-        date = Calendar.currentDateForNepalConversion
+        date = calendarService.currentDateForConversion
         fetchAndGenerateCalendar()
     }
 
@@ -243,7 +258,11 @@ public class CalendarViewModel: ObservableObject {
         self.yearData = nil
         self.todayYearData = nil
 
-        let viewedNepaliDate = DateConverter.toNepaliDate(from: date)!
+        guard let viewedNepaliDate = calendarService.nepaliDate(from: date) else {
+            generateCalendar()
+            return
+        }
+
         currentYear = viewedNepaliDate.bsYear
         dataService.loadData(forYear: viewedNepaliDate.bsYear, bundle: .main, ignoringCache: true) { result in
             DispatchQueue.main.async {
@@ -264,7 +283,11 @@ public class CalendarViewModel: ObservableObject {
     }
 
     private func loadTodayData(ignoringCache: Bool = false) {
-        let todayNepali = DateConverter.toNepaliDate(from: Calendar.currentDateForNepalConversion)!
+        guard let todayNepali = calendarService.currentNepaliDate() else {
+            todayYearData = nil
+            return
+        }
+
         dataService.loadData(forYear: todayNepali.bsYear, bundle: .main, ignoringCache: ignoringCache) { result in
             DispatchQueue.main.async {
                 switch result {
@@ -280,7 +303,10 @@ public class CalendarViewModel: ObservableObject {
         }
     }
     public func getInfo(for date: Date) -> (isHoliday: Bool, event: String?, tithi: String?) {
-        let nepaliDate = DateConverter.toNepaliDate(from: date)!
+        guard let nepaliDate = calendarService.nepaliDate(from: date) else {
+            return (date.isSaturday(), nil, nil)
+        }
+
         let isToday = Calendar.nepal.isDateInToday(date)
         
         let yearDataToUse = isToday ? todayYearData : yearData

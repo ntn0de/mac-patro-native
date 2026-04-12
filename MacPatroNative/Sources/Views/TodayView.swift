@@ -2,7 +2,7 @@ import SwiftUI
 import Combine
 
 public struct TodayView: View {
-    @ObservedObject var viewModel: TodayViewModel
+    @ObservedObject private var viewModel: TodayViewModel
     @ObservedObject private var settings = SettingsService.shared
 
     public init(viewModel: TodayViewModel = TodayViewModel()) {
@@ -91,11 +91,13 @@ public class TodayViewModel: ObservableObject {
     @Published public var nepalTimeString: String = ""
 
     private var calendarViewModel: CalendarViewModel
+    private let calendarService: NepaliCalendarServing
     private var cancellables = Set<AnyCancellable>()
     private var timer: Timer?
 
-    public init(calendarViewModel: CalendarViewModel = CalendarViewModel()) {
+    public init(calendarViewModel: CalendarViewModel = CalendarViewModel(), calendarService: NepaliCalendarServing = NepaliCalendarService.shared) {
         self.calendarViewModel = calendarViewModel
+        self.calendarService = calendarService
         fetchData()
         
         if settings.showNepalTime {
@@ -128,16 +130,24 @@ public class TodayViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    public func fetchData(for date: Date = Calendar.currentDateForNepalConversion) {
-        let today = date
-        let nepaliDate = DateConverter.gregorianToBikramSambat(date: today)
-        self.nepaliDay = NumberFormatter.nepaliString(from: nepaliDate.bsDay)
-        self.nepaliMonth = NepaliMonth(rawValue: nepaliDate.bsMonth)?.name ?? ""
-        self.nepaliYear = NumberFormatter.nepaliString(from: nepaliDate.bsYear)
-        
-        let dayOfWeek = LocalizationService.shared.nepaliDay(for: nepaliDate.dayOfWeek)
-        self.fullDateString = "\(dayOfWeek) \(self.nepaliDay), \(self.nepaliMonth) \(self.nepaliYear)"
-        
+    public func fetchData(for date: Date? = nil) {
+        let today = date ?? calendarService.currentDateForConversion
+        guard let display = calendarService.display(for: today) else {
+            self.nepaliDay = ""
+            self.nepaliMonth = ""
+            self.nepaliYear = ""
+            self.fullDateString = DateConverter.formatEnglishDate(date: today)
+            self.isHoliday = today.isSaturday()
+            self.event = nil
+            self.tithi = nil
+            return
+        }
+
+        self.nepaliDay = display.dayString
+        self.nepaliMonth = display.monthName
+        self.nepaliYear = display.yearString
+        self.fullDateString = display.fullDateString
+
         let info = calendarViewModel.getInfo(for: today)
         self.isHoliday = info.isHoliday
         self.event = info.event
@@ -170,4 +180,3 @@ public class TodayViewModel: ObservableObject {
         timer?.invalidate()
     }
 }
-

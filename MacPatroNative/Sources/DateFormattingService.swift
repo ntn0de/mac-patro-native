@@ -3,14 +3,21 @@ import Foundation
 
 public class DateFormattingService {
     public static let shared = DateFormattingService()
+    private let calendarService: NepaliCalendarServing
     
     private let dateFormats = ["d-MMMM", "yyyy-MM-dd", "MMMM d, yyyy"]
+
+    public init(calendarService: NepaliCalendarServing = NepaliCalendarService.shared) {
+        self.calendarService = calendarService
+    }
     
     public func formattedDate(for date: Date) -> String {
         let formatIndex = UserDefaults.standard.integer(forKey: "dateFormat")
         let format = dateFormats[formatIndex]
         
-        let nepaliDate = DateConverter.toNepaliDate(from: date)!
+        guard let nepaliDate = calendarService.nepaliDate(from: date) else {
+            return DateConverter.formatEnglishDate(date: date)
+        }
         
         let formatter = DateFormatter()
         formatter.dateFormat = format
