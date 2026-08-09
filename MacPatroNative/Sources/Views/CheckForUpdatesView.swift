@@ -9,24 +9,30 @@ public struct CheckForUpdatesView: View {
      
     public var body: some View {
         VStack {
-            Button("Check for Updates") {
+            Button {
                 updateService.checkForUpdates()
+            } label: {
+                Label("Check for Updates", systemImage: "arrow.clockwise")
             }
             
             if !updateService.updateMessage.isEmpty {
                 Text(updateService.updateMessage)
-                    .padding()
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             
             if let releaseURLString = updateService.releaseURL, let url = URL(string: releaseURLString) {
                 HStack {
-                    Link("Download", destination: url)
-                    Text(" | ")
-                    Link("Instructions", destination: instructionsURL)
+                    Link(destination: url) {
+                        Label("Download", systemImage: "arrow.down.circle")
+                    }
+                    Link(destination: instructionsURL) {
+                        Label("Instructions", systemImage: "questionmark.circle")
+                    }
                 }
             }
 
-            DisclosureGroup("Troubleshooting") {
+            DisclosureGroup {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("If macOS says Mac Patro is damaged or should be moved to the Trash, run this in Terminal:")
                         .font(.caption)
@@ -36,15 +42,19 @@ public struct CheckForUpdatesView: View {
                         .font(.caption.monospaced())
                         .textSelection(.enabled)
 
-                    Button("Copy Command") {
+                    Button {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(quarantineCommand, forType: .string)
+                    } label: {
+                        Label("Copy Command", systemImage: "doc.on.doc")
                     }
                     .buttonStyle(.plain)
                 }
                 .padding(.top, 4)
+            } label: {
+                Label("Troubleshooting", systemImage: "wrench.and.screwdriver")
             }
-            .padding(.top, 8)
+            .padding(.top, 4)
         }
         .onAppear {
             updateService.checkForUpdates()

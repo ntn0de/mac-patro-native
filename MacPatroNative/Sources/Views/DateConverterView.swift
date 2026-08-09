@@ -18,48 +18,56 @@ public struct DateConverterView: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Form {
-                DatePicker("English", selection: $gregorianDate, displayedComponents: .date)
-
-                HStack(alignment: .center, spacing: 8) {
-                    Stepper(value: $nepaliYear, in: DateConverter.supportedBSYearRange) {
-                        Text(NumberFormatter.nepaliString(from: nepaliYear))
-                            .frame(minWidth: 52, alignment: .leading)
-                    }
-
-                    Picker("Month", selection: $nepaliMonth) {
-                        ForEach(NepaliMonth.allCases, id: \.rawValue) { month in
-                            Text(month.name).tag(month.rawValue)
-                        }
-                    }
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("AD")
+                    .frame(width: 24, alignment: .leading)
+                DatePicker("", selection: $gregorianDate, displayedComponents: .date)
                     .labelsHidden()
+                Spacer()
+                Button {
+                    gregorianDate = Self.displayDate(fromConversionDate: Calendar.currentDateForNepalConversion)
+                } label: {
+                    Image(systemName: "arrow.counterclockwise")
+                }
+                .help("Today")
+            }
 
-                    Picker("Day", selection: $nepaliDay) {
-                        ForEach(1...daysInSelectedNepaliMonth, id: \.self) { day in
-                            Text(NumberFormatter.nepaliString(from: day)).tag(day)
-                        }
+            Divider()
+
+            HStack(spacing: 8) {
+                Text("BS")
+                    .frame(width: 24, alignment: .leading)
+                Stepper(value: $nepaliYear, in: DateConverter.supportedBSYearRange) {
+                    Text(NumberFormatter.nepaliString(from: nepaliYear))
+                        .frame(width: 52, alignment: .leading)
+                }
+                Picker("Month", selection: $nepaliMonth) {
+                    ForEach(NepaliMonth.allCases, id: \.rawValue) { month in
+                        Text(month.name).tag(month.rawValue)
                     }
-                    .labelsHidden()
                 }
+                .labelsHidden()
+                .frame(width: 120)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("AD: \(formattedGregorianDate)")
-                    Text("BS: \(formattedNepaliDate)")
+                Picker("Day", selection: $nepaliDay) {
+                    ForEach(1...daysInSelectedNepaliMonth, id: \.self) { day in
+                        Text(NumberFormatter.nepaliString(from: day)).tag(day)
+                    }
                 }
+                .labelsHidden()
+                .frame(width: 48)
+            }
+
+            Divider()
+
+            Text("\(formattedGregorianDate)  ↔  \(formattedNepaliDate)")
                 .font(.caption)
                 .foregroundStyle(.secondary)
-            }
-
-            HStack {
-                Spacer()
-                Button("Today") {
-                    gregorianDate = Self.displayDate(fromConversionDate: Calendar.currentDateForNepalConversion)
-                }
-            }
+                .lineLimit(1)
         }
         .padding()
-        .frame(width: 420, height: 260)
+        .frame(width: 380)
         .onAppear {
             syncNepaliFromGregorian()
         }
