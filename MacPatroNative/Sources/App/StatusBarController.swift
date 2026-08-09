@@ -105,6 +105,15 @@ class StatusBarController: NSObject, NSPopoverDelegate {
     func closePopover(sender: Any?) {
         popover.performClose(sender)
     }
+
+    func openCalendar() {
+        guard !popover.isShown, let button = statusItem.button else { return }
+        let positioningRect = NSRect(x: 0, y: button.bounds.height + 12, width: button.bounds.width, height: 0)
+        NSApp.activate(ignoringOtherApps: true)
+        popover.show(relativeTo: positioningRect, of: button, preferredEdge: .minY)
+        NotificationCenter.default.post(name: .calendarPopoverDidOpen, object: nil)
+        eventMonitor?.start()
+    }
     
     func popoverDidClose(_ notification: Notification) {
         eventMonitor?.stop()
