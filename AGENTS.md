@@ -19,6 +19,16 @@ Mac Patro is a macOS 13+ SwiftUI menu-bar application built with Swift Package M
 - Do not commit secrets or a private calendar-data URL. `MacPatroNative/Sources/RemoteURL.swift` is local configuration.
 - Keep app bundle versions numeric. `build.sh` exposes local builds as `<version>--build-<timestamp>` through `CFBundleGetInfoString`.
 
+## Product Quality
+
+App size, memory use, and responsiveness are product requirements—not cleanup work.
+
+- Before adding code or a dependency, prefer existing code and native APIs; reject additions that do not justify their size or runtime cost.
+- For every feature that affects packaging or runtime behavior, measure the packaged app (`du -sh "dist/Mac Patro.app"`) after `./build.sh` and report any size change.
+- Keep widgets lean: compile only the code and resources they need, refresh only when needed, and do not add resident timers or background work without an explicit need.
+- Preserve the established Mac Patro visual language across every surface: system-adaptive materials/colors, compact spacing, native typography, and the existing accent color. Reuse existing views and patterns before inventing new styling.
+- When a UI feature appears in more than one surface (menu popover, window, widget, or product site), keep its terminology, behavior, and visual treatment consistent; review each affected surface before finishing.
+
 ## Nepali Calendar Safety
 
 Calendar conversion is correctness-critical.
