@@ -13,10 +13,11 @@ Mac Patro is a macOS 13+ SwiftUI menu-bar application built with Swift Package M
 ## Working Rules
 
 - Make the smallest change that satisfies the request.
+- Do not commit changes until the user has approved the commit message.
 - Match the existing Swift style; do not introduce architecture or dependencies speculatively.
 - Prefer Swift, SwiftUI, Foundation, AppKit, and ServiceManagement APIs already available on macOS 13+.
 - Do not commit secrets or a private calendar-data URL. `MacPatroNative/Sources/RemoteURL.swift` is local configuration.
-- Keep app bundle versions numeric. `build.sh` exposes local builds as `<version>--build-<date>` through `CFBundleGetInfoString`.
+- Keep app bundle versions numeric. `build.sh` exposes local builds as `<version>--build-<timestamp>` through `CFBundleGetInfoString`.
 
 ## Nepali Calendar Safety
 
@@ -54,7 +55,7 @@ Build and package a universal app:
 ./build.sh 1.0.13      # explicit numeric version
 ```
 
-The output is `dist/Mac Patro.app`. The script copies the SwiftPM resource bundle, keeps `CFBundleShortVersionString` numeric, uses `YYYYMMDD` for `CFBundleVersion`, and displays `<version>--build-<date>` in the About window. Override the date only for reproducible builds with `BUILD_DATE=YYYY-MM-DD`.
+The output is `dist/Mac Patro.app`. The script copies the SwiftPM resource bundle, keeps `CFBundleShortVersionString` numeric, uses `YYYYMMDDHHMMSS` for `CFBundleVersion`, and displays `<version>--build-<timestamp>` in the About window. Override the timestamp only for reproducible builds with `BUILD_TIMESTAMP=YYYY-MM-DD-HHMMSS`.
 
 ## Releases and Homebrew
 
