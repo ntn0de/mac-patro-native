@@ -11,9 +11,9 @@ MACOS="$CONTENTS/MacOS"
 RESOURCES="$CONTENTS/Resources"
 PRODUCTS=".build/apple/Products/Release"
 VERSION="${1:-1.0.12}"
-BUILD_DATE="${BUILD_DATE:-$(date +%F)}"
-BUILD_NUMBER="${BUILD_DATE//-/}"
-DISPLAY_VERSION="$VERSION--build-$BUILD_DATE"
+BUILD_TIMESTAMP="${BUILD_TIMESTAMP:-$(date +%Y-%m-%d-%H%M%S)}"
+BUILD_NUMBER="${BUILD_TIMESTAMP//-/}"
+DISPLAY_VERSION="$VERSION--build-$BUILD_TIMESTAMP"
 
 if [[ ! "$VERSION" =~ ^[0-9]+(\.[0-9]+){1,2}$ ]]; then
     echo "Version must be numeric, for example: 1.0.12" >&2
@@ -56,6 +56,10 @@ cat > "$CONTENTS/Info.plist" <<EOF
     <string>$DISPLAY_VERSION</string>
     <key>LSMinimumSystemVersion</key>
     <string>13.0</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>Mac Patro shows your Calendar events for today.</string>
+    <key>NSCalendarsFullAccessUsageDescription</key>
+    <string>Mac Patro shows your Calendar events for today.</string>
     <key>LSUIElement</key>
     <true/>
 </dict>
