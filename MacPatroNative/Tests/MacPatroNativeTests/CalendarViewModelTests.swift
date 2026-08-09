@@ -39,6 +39,24 @@ final class CalendarViewModelTests: XCTestCase {
         XCTAssertTrue(holidayDateInfo.isHoliday)
     }
 
+    func testUpcomingEventsIncludesNamedEventsFromToday() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let today = calendar.date(from: DateComponents(year: 2024, month: 7, day: 26))!
+        let service = NepaliCalendarService(currentDateProvider: { today })
+        let dataService = MockDataService()
+        let viewModel = CalendarViewModel(date: today, dataService: dataService, calendarService: service)
+        viewModel.todayYearData = YearData(lastUpdatedAt: 1, data: [
+            MonthData(month: 4, days: [
+                DayData(isHoliday: true, event: "Today", tithi: nil, day: "११", dayInEn: "11", en: "2024-07-26"),
+                DayData(isHoliday: false, event: "Tomorrow", tithi: nil, day: "१२", dayInEn: "12", en: "2024-07-27"),
+                DayData(isHoliday: false, event: "--", tithi: nil, day: "१३", dayInEn: "13", en: "2024-07-28")
+            ])
+        ])
+
+        XCTAssertEqual(viewModel.upcomingEvents().map(\.title), ["Today", "Tomorrow"])
+    }
+
     func testForceRefreshBypassesCache() {
         let expectation = self.expectation(description: "Force refresh bypasses cache")
 
@@ -56,6 +74,7 @@ final class CalendarViewModelTests: XCTestCase {
     
     static var allTests = [
         ("testGetInfo", testGetInfo),
+        ("testUpcomingEventsIncludesNamedEventsFromToday", testUpcomingEventsIncludesNamedEventsFromToday),
         ("testForceRefreshBypassesCache", testForceRefreshBypassesCache),
     ]
 }

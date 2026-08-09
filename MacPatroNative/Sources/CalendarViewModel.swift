@@ -18,7 +18,8 @@ public class CalendarViewModel: ObservableObject {
     
     public init(date: Date? = nil, dataService: DataServiceProtocol = DataService(), calendarService: NepaliCalendarServing = NepaliCalendarService.shared) {
         self.calendarService = calendarService
-        self.date = date ?? calendarService.currentDateForConversion
+        let initialDate = date ?? calendarService.currentDateForConversion
+        self.date = initialDate
         self.dataService = dataService
         fetchAndGenerateCalendar()
         
@@ -287,6 +288,28 @@ public class CalendarViewModel: ObservableObject {
             }
         }
     }
+    public func upcomingEvents(limit: Int = 3) -> [UpcomingEvent] {
+        guard let todayNepali = calendarService.currentNepaliDate(), let yearData = todayYearData else {
+            return []
+        }
+
+        let today = Calendar.nepal.startOfDay(for: calendarService.currentDateForConversion)
+        return yearData.data.flatMap { month in
+            month.days.compactMap { day in
+                guard !day.event.isEmpty, day.event != "--",
+                      let dayNumber = Int(day.dayInEn),
+                      let date = DateConverter.toGregorianDate(from: NepaliDate(bsYear: todayNepali.bsYear, bsMonth: month.month, bsDay: dayNumber)),
+                      date >= today
+                else { return nil }
+
+                return UpcomingEvent(title: day.event, date: date)
+            }
+        }
+        .sorted { $0.date < $1.date }
+        .prefix(limit)
+        .map { $0 }
+    }
+
     public func getInfo(for date: Date) -> (isHoliday: Bool, event: String?, tithi: String?) {
         guard let nepaliDate = calendarService.nepaliDate(from: date) else {
             return (date.isSaturday(), nil, nil)
@@ -305,6 +328,24 @@ public class CalendarViewModel: ObservableObject {
         let tithi = (dayData.tithi?.isEmpty ?? true) ? nil : dayData.tithi
         
         return (isHoliday, event, tithi)
+    }
+}
+
+public struct UpcomingEvent: Identifiable {
+    public let title: String
+    public let date: Date
+
+    public var id: String { "\(title)-\(date.timeIntervalSince1970)" }
+
+    public var daysRemaining: Int {
+        Calendar.nepal.dateComponents([.day], from: Calendar.nepal.startOfDay(for: Date()), to: Calendar.nepal.startOfDay(for: date)).day ?? 0
+    }
+
+    public var tooltip: String {
+        let nepaliDate = NepaliCalendarService.shared.display(for: date)?.fullDateString ?? ""
+        return [nepaliDate, DateConverter.formatEnglishDate(date: date)]
+            .filter { !$0.isEmpty }
+            .joined(separator: "\n")
     }
 }
 
