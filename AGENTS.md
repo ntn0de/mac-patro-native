@@ -55,3 +55,18 @@ Build and package a universal app:
 ```
 
 The output is `dist/Mac Patro.app`. The script copies the SwiftPM resource bundle, keeps `CFBundleShortVersionString` numeric, uses `YYYYMMDD` for `CFBundleVersion`, and displays `<version>--build-<date>` in the About window. Override the date only for reproducible builds with `BUILD_DATE=YYYY-MM-DD`.
+
+## Releases and Homebrew
+
+Releases are explicit and tag-driven. Merging to `main` does not release.
+
+When asked to release:
+
+1. Ensure the release commit is on `main`, the working tree is clean, and validation passes.
+2. Require an explicit `vMAJOR.MINOR.PATCH` version from the user; never guess or auto-increment it.
+3. Create the tag from updated `main` and push only that tag.
+4. Wait for the `Release MacPatro Native` GitHub Actions run to finish; do not report success immediately after pushing.
+5. Verify the GitHub release contains both DMGs.
+6. Verify the workflow's follow-up `chore(homebrew): update cask to v<version>` commit reached `main` and that `Casks/mac-patro.rb` contains the release version and SHA256.
+
+The workflow creates the release before committing the cask update, so a failed release cannot publish a cask pointing at a missing asset. Repository settings and branch protection must allow GitHub Actions to write that cask commit to `main`.
