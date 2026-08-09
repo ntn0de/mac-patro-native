@@ -1,5 +1,5 @@
 import Foundation
 
 struct AppVersion {
-    static let version = "1.0.12"
+    static let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleGetInfoString") as? String ?? "1.0.12"
 }

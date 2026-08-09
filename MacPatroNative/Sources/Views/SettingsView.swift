@@ -1,5 +1,5 @@
+import ServiceManagement
 import SwiftUI
-import LaunchAtLogin
 
 public struct SettingsView: View {
     @ObservedObject private var settings = SettingsService.shared
@@ -36,6 +36,22 @@ public struct SettingsView: View {
         }
     }
 
+    private var launchAtLogin: Binding<Bool> {
+        Binding {
+            SMAppService.mainApp.status == .enabled
+        } set: { enabled in
+            do {
+                if enabled {
+                    try SMAppService.mainApp.register()
+                } else {
+                    try SMAppService.mainApp.unregister()
+                }
+            } catch {
+                log("Failed to update launch at login:", error)
+            }
+        }
+    }
+
     public var body: some View {
         VStack {
             Form {
@@ -52,7 +68,7 @@ public struct SettingsView: View {
                 }
                 
                 Toggle("Show Nepal Time", isOn: $settings.showNepalTime)
-                LaunchAtLogin.Toggle()
+                Toggle("Launch at Login", isOn: launchAtLogin)
             }
             
             Spacer()

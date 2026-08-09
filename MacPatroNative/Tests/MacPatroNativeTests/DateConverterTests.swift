@@ -59,8 +59,8 @@ final class DateConverterTests: XCTestCase {
     }
 
     func testNepaliMonthNavigationAcrossSupportedDates() {
-        let firstSupportedYear = 1970
-        let lastSupportedYear = 1970 + 117 - 1
+        let firstSupportedYear = DateConverter.supportedBSYearRange.lowerBound
+        let lastSupportedYear = DateConverter.supportedBSYearRange.upperBound
 
         for year in firstSupportedYear...lastSupportedYear {
             for month in 1...12 {

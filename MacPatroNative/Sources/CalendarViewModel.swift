@@ -188,21 +188,6 @@ public class CalendarViewModel: ObservableObject {
         return tithi
     }
     
-    func isTodayHoliday(date: NepaliDate) -> Bool {
-        guard let dayData = getDayData(for: date, from: todayYearData) else { return false }
-        return dayData.isHoliday
-    }
-    
-    func getTodayEvent(date: NepaliDate) -> String? {
-        guard let dayData = getDayData(for: date, from: todayYearData), !dayData.event.isEmpty, dayData.event != "--" else { return nil }
-        return dayData.event
-    }
-
-    func getTodayTithi(date: NepaliDate) -> String? {
-        guard let dayData = getDayData(for: date, from: todayYearData), let tithi = dayData.tithi, !tithi.isEmpty else { return nil }
-        return tithi
-    }
-
     private func getDayData(for date: NepaliDate, from yearData: YearData?) -> DayData? {
         guard let yearData = yearData,
               let monthData = yearData.data.first(where: { $0.month == date.bsMonth }),

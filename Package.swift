@@ -12,13 +12,9 @@ let package = Package(
             targets: ["MacPatroNativeApp"]
         )
     ],
-    dependencies: [
-        .package(url: "https://github.com/sindresorhus/LaunchAtLogin-Modern.git", from: "1.0.0")
-    ],
     targets: [
         .target(
             name: "MacPatroKit",
-            dependencies: [.product(name: "LaunchAtLogin", package: "LaunchAtLogin-Modern")],
             path: "MacPatroNative/Sources",
             exclude: ["App"],
             resources: [
