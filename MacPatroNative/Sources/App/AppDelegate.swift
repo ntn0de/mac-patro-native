@@ -11,8 +11,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         statusBarController = StatusBarController()
 
+        // Keep DateChangeService alive and push widget reloads on day boundaries.
         DateChangeService.shared.dayDidChange
             .sink { WidgetReload.reload() }
+            .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)
+            .sink { _ in
+                DateChangeService.shared.publishIfDayChanged()
+                WidgetReload.reload()
+            }
+            .store(in: &cancellables)
+
+        NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didWakeNotification)
+            .receive(on: RunLoop.main)
+            .sink { _ in
+                DateChangeService.shared.publishIfDayChanged()
+                WidgetReload.reload()
+            }
             .store(in: &cancellables)
 
         WidgetReload.reload()

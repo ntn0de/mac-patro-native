@@ -83,14 +83,20 @@ struct MacPatroWidgetProvider: TimelineProvider {
     }
 
     private static func timeline(from now: Date, yearData: YearData?) -> Timeline<MacPatroWidgetEntry> {
+        let nextMidnight = nextNepalMidnight(after: now)
         var entries = [makeEntry(at: now, yearData: yearData)]
+
+        // Pre-bake a week of Nepal midnights so the date still advances if WidgetKit
+        // delays the reload request while the Mac is asleep.
         var cursor = Calendar.nepal.startOfDay(for: now)
-        for _ in 0..<3 {
+        for _ in 0..<7 {
             guard let midnight = Calendar.nepal.date(byAdding: .day, value: 1, to: cursor) else { break }
             entries.append(makeEntry(at: midnight, yearData: yearData))
             cursor = midnight
         }
-        return Timeline(entries: entries, policy: .atEnd)
+
+        // Ask WidgetKit to rebuild again after the next midnight (best-effort).
+        return Timeline(entries: entries, policy: .after(nextMidnight))
     }
 
     private func entry(at date: Date = Date()) -> MacPatroWidgetEntry {
