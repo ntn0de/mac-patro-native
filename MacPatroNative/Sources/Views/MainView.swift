@@ -4,7 +4,14 @@ import AppKit
 extension Notification.Name {
     public static let calendarPopoverDidOpen = Notification.Name("calendarPopoverDidOpen")
     public static let calendarPopoverDidClose = Notification.Name("calendarPopoverDidClose")
-    public static let eventPanelHeightDidChange = Notification.Name("eventPanelHeightDidChange")
+    public static let popoverContentHeightDidChange = Notification.Name("popoverContentHeightDidChange")
+}
+
+private struct PopoverContentHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
 }
 
 public struct MainView: View {
@@ -16,6 +23,7 @@ public struct MainView: View {
     @State private var displayedNewYearGreetingYear: Int?
     @State private var selectedSection = CalendarSection.events
     @State private var calendarEventRowCount = 0
+    @State private var isEventPanelExpanded = true
     
     private let calendarService: NepaliCalendarServing
     private let settingsWindowController = SettingsWindowController()
@@ -60,11 +68,12 @@ public struct MainView: View {
             TodayView(viewModel: todayViewModel)
             MonthSwitcherView(viewModel: viewModel)
             CalendarGridView(viewModel: viewModel)
-            Spacer(minLength: 8)
+            Color.clear.frame(height: 8)
             Divider()
             HStack(spacing: 12) {
                 Button("Events") {
                     selectedSection = .events
+                    isEventPanelExpanded = true
                 }
                 .buttonStyle(.plain)
                 .padding(.horizontal, 10)
@@ -74,6 +83,7 @@ public struct MainView: View {
 
                 Button("Calendar") {
                     selectedSection = .calendar
+                    isEventPanelExpanded = true
                 }
                 .buttonStyle(.plain)
                 .padding(.horizontal, 10)
@@ -81,20 +91,42 @@ public struct MainView: View {
                 .background(selectedSection == .calendar ? Color.gray.opacity(0.25) : .clear, in: Capsule())
                 .foregroundStyle(selectedSection == .calendar ? .primary : .secondary)
 
-                Spacer()
-            }
+                Spacer(minLength: 0)
 
-            Group {
-                if selectedSection == .events {
-                    EventsView(viewModel: viewModel)
-                } else {
-                    CalendarEventsView(rowCount: $calendarEventRowCount)
+                Button {
+                    isEventPanelExpanded.toggle()
+                } label: {
+                    Image(systemName: isEventPanelExpanded ? "chevron.down" : "chevron.right")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 24, height: 24)
+                        .background(.white.opacity(0.2))
+                        .clipShape(Circle())
+                        .contentShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .help(isEventPanelExpanded ? "Collapse" : "Expand")
+                .accessibilityLabel(isEventPanelExpanded ? "Collapse events" : "Expand events")
+                .onHover { hovering in
+                    if hovering {
+                        NSCursor.pointingHand.push()
+                    } else {
+                        NSCursor.pop()
+                    }
                 }
             }
-            .frame(width: 328, height: eventPanelHeight, alignment: .topLeading)
-            .onAppear(perform: reportPanelHeight)
-            .onChange(of: calendarEventRowCount) { _ in reportPanelHeight() }
-            .onChange(of: viewModel.upcomingEvents().count) { _ in reportPanelHeight() }
+
+            if isEventPanelExpanded {
+                Group {
+                    if selectedSection == .events {
+                        EventsView(viewModel: viewModel)
+                    } else {
+                        CalendarEventsView(rowCount: $calendarEventRowCount)
+                    }
+                }
+                .frame(width: 328, height: eventPanelHeight, alignment: .topLeading)
+            }
+
             HStack(spacing: 14) {
                 Spacer()
                 Button {
@@ -118,13 +150,29 @@ public struct MainView: View {
         }
         .padding()
         .background(.ultraThinMaterial.opacity(0.5))
-        .frame(maxWidth: 360)
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(width: 360)
+        .background(
+            GeometryReader { proxy in
+                Color.clear.preference(key: PopoverContentHeightKey.self, value: proxy.size.height)
+            }
+        )
+        .onPreferenceChange(PopoverContentHeightKey.self) { height in
+            guard height > 0 else { return }
+            NotificationCenter.default.post(
+                name: .popoverContentHeightDidChange,
+                object: nil,
+                userInfo: ["height": height]
+            )
+        }
         .onAppear {
             updateService.checkForUpdates()
             presentNewYearGreetingIfNeeded()
         }
         .onReceive(NotificationCenter.default.publisher(for: .calendarPopoverDidOpen)) { _ in
+            DateChangeService.shared.publishIfDayChanged()
             viewModel.goToToday()
+            todayViewModel.fetchData()
             updateService.checkForUpdates()
             presentNewYearGreetingIfNeeded()
         }
@@ -152,14 +200,6 @@ public struct MainView: View {
         let eventHeight = max(viewModel.upcomingEvents().count, 1) * 43
         let calendarHeight = calendarEventRowCount == 0 ? 43 : min(calendarEventRowCount, 3) * 42 + 34
         return CGFloat(max(eventHeight, calendarHeight))
-    }
-
-    private func reportPanelHeight() {
-        NotificationCenter.default.post(
-            name: .eventPanelHeightDidChange,
-            object: nil,
-            userInfo: ["height": eventPanelHeight]
-        )
     }
 
     private func presentNewYearGreetingIfNeeded() {
@@ -191,7 +231,6 @@ private enum CalendarSection {
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
         ZStack {
-//            Color.black.ignoresSafeArea()
             MainView()
         }
     }

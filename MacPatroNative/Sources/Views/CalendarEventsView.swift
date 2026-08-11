@@ -102,10 +102,16 @@ struct CalendarEventsView: View {
             withAnimation(.easeInOut(duration: 0.7).repeatForever(autoreverses: true)) {
                 isBlinking = true
             }
-            requestAccessAndLoad()
+            refreshForToday()
         }
         .onChange(of: displayedDate) { _ in
             loadEvents()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .calendarPopoverDidOpen)) { _ in
+            refreshForToday()
+        }
+        .onReceive(DateChangeService.shared.dayDidChange) { _ in
+            refreshForToday()
         }
     }
 
@@ -113,6 +119,15 @@ struct CalendarEventsView: View {
         let formatter = DateFormatter()
         formatter.dateStyle = .full
         return formatter.string(from: displayedDate)
+    }
+
+    private func refreshForToday() {
+        let today = Calendar.current.startOfDay(for: Date())
+        if !Calendar.current.isDate(displayedDate, inSameDayAs: today) {
+            displayedDate = today
+        } else {
+            requestAccessAndLoad()
+        }
     }
 
     private func requestAccessAndLoad() {

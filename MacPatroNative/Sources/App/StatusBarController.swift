@@ -28,7 +28,7 @@ class StatusBarController: NSObject, NSPopoverDelegate {
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(rootView: mainView)
         popover.delegate = self
-        NotificationCenter.default.addObserver(self, selector: #selector(updatePopoverHeight(_:)), name: .eventPanelHeightDidChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updatePopoverHeight(_:)), name: .popoverContentHeightDidChange, object: nil)
         
         let aboutMenuItem = NSMenuItem(title: "About", action: #selector(about), keyEquivalent: "")
         aboutMenuItem.image = menuImage("info.circle")
@@ -77,7 +77,9 @@ class StatusBarController: NSObject, NSPopoverDelegate {
 
     @objc private func updatePopoverHeight(_ notification: Notification) {
         guard let height = notification.userInfo?["height"] as? NSNumber else { return }
-        popover.contentSize.height = 500 + CGFloat(height.doubleValue)
+        let newHeight = CGFloat(height.doubleValue)
+        guard abs(popover.contentSize.height - newHeight) > 0.5 else { return }
+        popover.contentSize = NSSize(width: 360, height: newHeight)
     }
 
     @objc func togglePopover(_ sender: Any?) {

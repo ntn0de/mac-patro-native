@@ -238,6 +238,7 @@ public class CalendarViewModel: ObservableObject {
     func goToToday() {
         date = calendarService.currentDateForConversion
         fetchAndGenerateCalendar()
+        loadTodayData()
     }
 
     public func forceRefresh() {
