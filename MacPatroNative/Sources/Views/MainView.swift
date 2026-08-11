@@ -24,6 +24,7 @@ public struct MainView: View {
     @State private var selectedSection = CalendarSection.events
     @State private var calendarEventRowCount = 0
     @State private var isEventPanelExpanded = true
+    @State private var hoveredToolbarHelp: String?
     
     private let calendarService: NepaliCalendarServing
     private let settingsWindowController = SettingsWindowController()
@@ -70,7 +71,7 @@ public struct MainView: View {
             CalendarGridView(viewModel: viewModel)
             Color.clear.frame(height: 8)
             Divider()
-            HStack(spacing: 12) {
+            HStack(spacing: 8) {
                 Button("Events") {
                     selectedSection = .events
                     isEventPanelExpanded = true
@@ -80,6 +81,7 @@ public struct MainView: View {
                 .padding(.vertical, 5)
                 .background(selectedSection == .events ? Color.gray.opacity(0.25) : .clear, in: Capsule())
                 .foregroundStyle(selectedSection == .events ? .primary : .secondary)
+                .help("Upcoming Nepali events")
 
                 Button("Calendar") {
                     selectedSection = .calendar
@@ -90,31 +92,49 @@ public struct MainView: View {
                 .padding(.vertical, 5)
                 .background(selectedSection == .calendar ? Color.gray.opacity(0.25) : .clear, in: Capsule())
                 .foregroundStyle(selectedSection == .calendar ? .primary : .secondary)
+                .help("Today's calendar events")
 
                 Spacer(minLength: 0)
 
-                Button {
-                    isEventPanelExpanded.toggle()
-                } label: {
-                    Image(systemName: isEventPanelExpanded ? "chevron.down" : "chevron.right")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                        .frame(width: 24, height: 24)
-                        .background(.white.opacity(0.2))
-                        .clipShape(Circle())
-                        .contentShape(Circle())
+                toolbarCircleButton(
+                    systemName: "arrow.left.arrow.right",
+                    help: "Convert BS ↔ AD dates"
+                ) {
+                    dateConverterWindowController.openDateConverter()
                 }
-                .buttonStyle(.plain)
-                .help(isEventPanelExpanded ? "Collapse" : "Expand")
-                .accessibilityLabel(isEventPanelExpanded ? "Collapse events" : "Expand events")
-                .onHover { hovering in
-                    if hovering {
-                        NSCursor.pointingHand.push()
-                    } else {
-                        NSCursor.pop()
-                    }
+
+                toolbarCircleButton(
+                    systemName: "gearshape",
+                    help: "Open settings"
+                ) {
+                    settingsWindowController.openSettings()
+                }
+
+                toolbarCircleButton(
+                    systemName: isEventPanelExpanded ? "chevron.down" : "chevron.right",
+                    help: isEventPanelExpanded ? "Hide events list" : "Show events list",
+                    accessibilityLabel: isEventPanelExpanded ? "Collapse events" : "Expand events"
+                ) {
+                    isEventPanelExpanded.toggle()
                 }
             }
+            .overlay(alignment: .topTrailing) {
+                if let hoveredToolbarHelp {
+                    Text(hoveredToolbarHelp)
+                        .font(.caption2)
+                        .foregroundStyle(.primary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                .strokeBorder(Color.primary.opacity(0.08), lineWidth: 1)
+                        )
+                        .offset(y: -28)
+                        .transition(.opacity)
+                }
+            }
+            .animation(.easeInOut(duration: 0.12), value: hoveredToolbarHelp)
 
             if isEventPanelExpanded {
                 Group {
@@ -126,27 +146,6 @@ public struct MainView: View {
                 }
                 .frame(width: 328, height: eventPanelHeight, alignment: .topLeading)
             }
-
-            HStack(spacing: 14) {
-                Spacer()
-                Button {
-                    dateConverterWindowController.openDateConverter()
-                } label: {
-                    Image(systemName: "arrow.left.arrow.right")
-                }
-                .buttonStyle(.plain)
-                .help("Date Converter")
-
-                Button {
-                    settingsWindowController.openSettings()
-                } label: {
-                    Image(systemName: "gearshape")
-                }
-                .buttonStyle(.plain)
-                .help("Settings")
-            }
-            .font(.title3)
-            .foregroundStyle(.secondary)
         }
         .padding()
         .background(.ultraThinMaterial.opacity(0.5))
@@ -192,6 +191,39 @@ public struct MainView: View {
                 } else {
                     self.showUpdateBadge = true
                 }
+            }
+        }
+    }
+
+
+    @ViewBuilder
+    private func toolbarCircleButton(
+        systemName: String,
+        help helpText: String,
+        accessibilityLabel: String? = nil,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .frame(width: 24, height: 24)
+                .background(.white.opacity(0.2))
+                .clipShape(Circle())
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .help(helpText)
+        .accessibilityLabel(accessibilityLabel ?? helpText)
+        .onHover { hovering in
+            if hovering {
+                hoveredToolbarHelp = helpText
+                NSCursor.pointingHand.push()
+            } else {
+                if hoveredToolbarHelp == helpText {
+                    hoveredToolbarHelp = nil
+                }
+                NSCursor.pop()
             }
         }
     }

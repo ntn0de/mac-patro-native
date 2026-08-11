@@ -98,6 +98,7 @@ class StatusBarController: NSObject, NSPopoverDelegate {
                     NSApp.activate(ignoringOtherApps: true)
                     popover.show(relativeTo: positioningRect, of: button, preferredEdge: .minY)
                     NotificationCenter.default.post(name: .calendarPopoverDidOpen, object: nil)
+                    WidgetReload.reload()
                     eventMonitor?.start()
                 }
             }
@@ -114,6 +115,7 @@ class StatusBarController: NSObject, NSPopoverDelegate {
         NSApp.activate(ignoringOtherApps: true)
         popover.show(relativeTo: positioningRect, of: button, preferredEdge: .minY)
         NotificationCenter.default.post(name: .calendarPopoverDidOpen, object: nil)
+        WidgetReload.reload()
         eventMonitor?.start()
     }
     

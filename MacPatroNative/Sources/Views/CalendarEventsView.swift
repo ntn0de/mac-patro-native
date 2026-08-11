@@ -59,7 +59,7 @@ struct CalendarEventsView: View {
                                         if event.showsLiveProgress {
                                             ProgressView(value: event.progress)
                                                 .progressViewStyle(.linear)
-                                                .tint(.accentColor)
+                                                .tint(event.color)
                                                 .scaleEffect(y: 0.45)
                                         }
                                     }
@@ -67,7 +67,7 @@ struct CalendarEventsView: View {
                                     .foregroundStyle(.secondary)
                                     .frame(width: 120, alignment: .trailing)
                                     Capsule()
-                                        .fill(event.showsLiveProgress ? Color.accentColor : event.color)
+                                        .fill(event.color)
                                         .frame(width: 4, height: event.timelineHeight)
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(event.title)
@@ -207,6 +207,20 @@ private struct CalendarEvent: Identifiable {
         let duration = event.endDate.timeIntervalSince(event.startDate)
         progress = duration > 0 ? min(max(Date().timeIntervalSince(event.startDate) / duration, 0), 1) : 0
         timelineHeight = event.isAllDay ? 22 : min(max(CGFloat(duration) / 120, 26), 56)
-        color = event.calendar.cgColor.map(Color.init(cgColor:)) ?? .gray
+        color = Self.color(forCalendarName: event.calendar.title)
+    }
+
+    /// Stable, distinct accent per calendar account/email title.
+    private static func color(forCalendarName name: String) -> Color {
+        let key = name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        var hash: UInt64 = 5381
+        for byte in key.utf8 {
+            hash = ((hash << 5) &+ hash) &+ UInt64(byte)
+        }
+
+        let hue = Double(hash % 360) / 360.0
+        let saturation = 0.55 + Double((hash >> 9) % 25) / 100.0
+        let brightness = 0.72 + Double((hash >> 17) % 18) / 100.0
+        return Color(hue: hue, saturation: saturation, brightness: brightness)
     }
 }

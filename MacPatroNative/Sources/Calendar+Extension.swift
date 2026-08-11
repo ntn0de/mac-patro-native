@@ -11,12 +11,15 @@ public extension Calendar {
     /// DateConverter works with UTC day boundaries, so we need to shift the date
     /// by Nepal's timezone offset to get the correct Nepali date
     static var currentDateForNepalConversion: Date {
-        let now = Date()
+        dateForNepalConversion(from: Date())
+    }
+
+    static func dateForNepalConversion(from date: Date) -> Date {
         let nepalTimeZone = TimeZone(identifier: "Asia/Kathmandu")!
-        let nepalOffset = nepalTimeZone.secondsFromGMT(for: now)
+        let nepalOffset = nepalTimeZone.secondsFromGMT(for: date)
         
         // Add the Nepal timezone offset so when DateConverter calculates 
         // days from UTC epoch, it will count the correct Nepal day
-        return now.addingTimeInterval(TimeInterval(nepalOffset))
+        return date.addingTimeInterval(TimeInterval(nepalOffset))
     }
 }
