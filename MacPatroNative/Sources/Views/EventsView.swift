@@ -29,7 +29,7 @@ struct EventsView: View {
                             Text(event.title)
                                 .lineLimit(1)
                             Spacer()
-                            Text("\(NumberFormatter.nepaliString(from: event.daysRemaining)) दिन")
+                            Text(event.relativeDaysLabel)
                                 .foregroundStyle(.secondary)
                         }
                         .padding(.vertical, 8)

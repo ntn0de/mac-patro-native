@@ -340,31 +340,29 @@ private struct MediumWidgetView: View {
     private var holidayColor: Color { Color(red: 0.85, green: 0.1, blue: 0.15) }
 
     var body: some View {
-        HStack(alignment: .center, spacing: 10) {
-            // Match small widget hierarchy: weekday → day → month/year → tithi
-            VStack(spacing: 4) {
-                Text(display?.dayOfWeekName ?? "नेपाली पात्रो")
-                    .font(.headline)
-                    .foregroundStyle(entry.isHoliday ? holidayColor : WidgetColors.accent)
-                    .lineLimit(1)
-                Text(display?.dayString ?? "–")
-                    .font(.system(size: 44, weight: .medium, design: .rounded))
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(dayMonthTitle)
+                    .font(.system(size: 28, weight: .semibold, design: .rounded))
                     .foregroundStyle(entry.isHoliday ? holidayColor : .primary)
                     .minimumScaleFactor(0.7)
                     .lineLimit(1)
-                Text("\(display?.monthName ?? "") \(display?.yearString ?? "")")
-                    .font(.headline)
-                    .foregroundStyle(entry.isHoliday ? holidayColor : .primary)
+                Text(weekdayYearTitle)
+                    .font(.subheadline)
+                    .foregroundStyle(.primary)
                     .lineLimit(1)
                 if !today.tithi.isEmpty {
                     Text(today.tithi)
-                        .font(.caption)
-                        .foregroundStyle(WidgetColors.secondary)
+                        .font(.subheadline)
+                        .foregroundStyle(.primary)
                         .lineLimit(2)
-                        .multilineTextAlignment(.center)
                 }
+                Text(englishDateLabel)
+                    .font(.subheadline)
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             miniCalendar
                 .frame(width: 150)
@@ -374,17 +372,32 @@ private struct MediumWidgetView: View {
         .accessibilityLabel(display?.fullDateString ?? "Nepali date")
     }
 
+    private var dayMonthTitle: String {
+        [display?.dayString, display?.monthName]
+            .compactMap { $0 }
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+    }
+
+    private var weekdayYearTitle: String {
+        let weekday = display?.dayOfWeekName ?? ""
+        let year = display?.yearString ?? ""
+        if weekday.isEmpty { return year }
+        if year.isEmpty { return weekday }
+        return "\(weekday), \(year)"
+    }
+
+    private var englishDateLabel: String {
+        guard let display else { return DateConverter.formatEnglishDate(date: Date()) }
+        return DateConverter.formatEnglishDate(date: display.gregorianDate)
+    }
+
     private var miniCalendar: some View {
         let rows = stride(from: 0, to: entry.monthDays.count, by: 7).map { start in
             Array(entry.monthDays[start..<min(start + 7, entry.monthDays.count)])
         }
 
         return VStack(spacing: 3) {
-            Text(display.map { "\($0.monthName) \($0.yearString)" } ?? "")
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(WidgetColors.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
             HStack(spacing: 2) {
                 ForEach(weekdayLabels, id: \.self) { label in
                     Text(label)

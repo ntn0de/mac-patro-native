@@ -342,6 +342,14 @@ public struct UpcomingEvent: Identifiable {
         Calendar.nepal.dateComponents([.day], from: Calendar.nepal.startOfDay(for: Date()), to: Calendar.nepal.startOfDay(for: date)).day ?? 0
     }
 
+    public var relativeDaysLabel: String {
+        let days = daysRemaining
+        if days <= 0 {
+            return "आज"
+        }
+        return "\(NumberFormatter.nepaliString(from: days)) दिन पछि"
+    }
+
     public var tooltip: String {
         let nepaliDate = NepaliCalendarService.shared.display(for: date)?.fullDateString ?? ""
         return [nepaliDate, DateConverter.formatEnglishDate(date: date)]
