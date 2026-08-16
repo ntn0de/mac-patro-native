@@ -22,6 +22,12 @@ public protocol NepaliCalendarServing {
 public final class NepaliCalendarService {
     public static let shared = NepaliCalendarService()
 
+    private static let nepaliWeekdays = [
+        "Sunday": "आइतबार", "Monday": "सोमबार", "Tuesday": "मङ्गलबार",
+        "Wednesday": "बुधबार", "Thursday": "बिहिबार", "Friday": "शुक्रबार",
+        "Saturday": "शनिबार"
+    ]
+
     private let currentDateProvider: () -> Date
 
     public init(currentDateProvider: @escaping () -> Date = { Calendar.currentDateForNepalConversion }) {
@@ -48,7 +54,7 @@ public final class NepaliCalendarService {
         let dayString = NumberFormatter.nepaliString(from: nepaliDate.bsDay)
         let monthName = NepaliMonth(rawValue: nepaliDate.bsMonth)?.name ?? ""
         let yearString = NumberFormatter.nepaliString(from: nepaliDate.bsYear)
-        let dayOfWeekName = LocalizationService.shared.nepaliDay(for: nepaliDate.dayOfWeek)
+        let dayOfWeekName = Self.nepaliWeekdays[nepaliDate.dayOfWeek] ?? nepaliDate.dayOfWeek
         let fullDateString = "\(dayOfWeekName) \(dayString), \(monthName) \(yearString)"
 
         return NepaliDateDisplay(

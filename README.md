@@ -4,11 +4,25 @@ A simple and lightweight macOS menu bar application to display the Nepali date.
 
 ## Installation
 
-The easiest way to install Mac Patro is to download the latest release from the [GitHub Releases](https://github.com/ntn0de/mac-patro-native/releases) page.
+### Homebrew
 
-1.  Go to the Releases page.
-2.  Download the `.dmg` file from the latest release.
-3.  Open the `.dmg` file and drag `Mac Patro.app` to your `Applications` folder.
+```bash
+brew tap ntn0de/mac-patro-native https://github.com/ntn0de/mac-patro-native
+brew install --cask mac-patro
+```
+
+Update later with:
+
+```bash
+brew update
+brew upgrade --cask mac-patro
+```
+
+### Direct Download
+
+1. Go to [GitHub Releases](https://github.com/ntn0de/mac-patro-native/releases).
+2. Download the `.dmg` file from the latest release.
+3. Open it and drag `Mac Patro.app` to your Applications folder.
 
 If macOS says the app is damaged or should be moved to the Trash, see the **Troubleshooting** section below.
 
@@ -164,7 +178,7 @@ Before building the application, you must provide a remote URL for fetching cale
 
 ## Automated Release Workflow
 
-This repository includes a GitHub Actions workflow to automate the release process. When you push a new tag (e.g., `v1.0.1`), the workflow will build the application, package it, and create a new release on GitHub with the `.dmg` file attached.
+Version tags trigger the release workflow. It builds the application, publishes the DMGs and GitHub release, then updates the Homebrew cask on `main`.
 
 ### Setting Up the Remote URL for Releases
 
@@ -179,20 +193,21 @@ The automated workflow requires a secret to be set in your repository to securel
 7.  Click **Add secret**.
 ### How to Release
 
-To create a new release, you simply need to create and push a new Git tag. The automated workflow will handle the rest.
+After merging the release changes into `main`, create and push an explicit semantic-version tag:
 
-1.  **Create a new tag:**
-    Replace `v1.0.1` with your desired version number.
-    ```bash
-    git tag v1.0.1
-    ```
+```bash
+git switch main
+git pull --ff-only
+git tag v1.0.13
+git push origin v1.0.13
+```
 
-2.  **Push the tag to GitHub:**
-    ```bash
-    git push origin v1.0.1
-    ```
+The workflow then:
 
-This will trigger the GitHub Actions workflow, which will build and release the new version of the application.
+1. Builds and publishes the GitHub release and DMGs.
+2. Waits for release creation to succeed.
+3. Updates the cask version and SHA256.
+4. Commits and pushes the cask update to `main`.
 
 
 ## License

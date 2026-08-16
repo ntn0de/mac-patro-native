@@ -10,7 +10,7 @@ public class DateConverterWindowController: NSObject {
             let hostingController = NSHostingController(rootView: converterView)
             let window = NSWindow(contentViewController: hostingController)
             window.title = "Date Converter"
-            window.setContentSize(NSSize(width: 420, height: 260))
+            window.setContentSize(NSSize(width: 380, height: 180))
             window.isReleasedWhenClosed = false
             window.level = .floating
             dateConverterWindow = window

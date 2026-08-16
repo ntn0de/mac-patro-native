@@ -1,0 +1,45 @@
+name: MacPatroWidgetExtension
+options:
+  deploymentTarget:
+    macOS: "13.0"
+targets:
+  MacPatroWidgetExtension:
+    type: app-extension
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - path: MacPatroWidgets.swift
+      - path: ../Sources/Calendar+Extension.swift
+      - path: ../Sources/CalendarModels.swift
+      - path: ../Sources/DateConverter.swift
+      - path: ../Sources/NepaliDate.swift
+      - path: ../Sources/NepaliMonth.swift
+      - path: ../Sources/RemoteURL.swift
+      - path: ../Sources/Utils.swift
+    dependencies:
+      - sdk: SwiftUI.framework
+      - sdk: WidgetKit.framework
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: Mac Patro
+        CFBundleName: MacPatroWidgetExtension
+        CFBundlePackageType: XPC!
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        LSMinimumSystemVersion: "13.0"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        APPLICATION_EXTENSION_API_ONLY: true
+        CODE_SIGNING_ALLOWED: false
+        CODE_SIGN_ENTITLEMENTS: MacPatroWidgets.entitlements
+        ENABLE_APP_SANDBOX: true
+        ENABLE_DEBUG_DYLIB: false
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks"
+        MARKETING_VERSION: "1.0.12"
+        CURRENT_PROJECT_VERSION: "1"
+        PRODUCT_BUNDLE_IDENTIFIER: com.agamtech.macpatro.widgets
+        PRODUCT_NAME: MacPatroWidgetExtension
+        SWIFT_VERSION: "5.7"

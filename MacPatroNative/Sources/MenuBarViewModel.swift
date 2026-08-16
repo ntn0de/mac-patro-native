@@ -5,7 +5,6 @@ import Combine
 
 public class MenuBarViewModel: ObservableObject {
     @Published public var menuBarText: String = "MacPatro"
-    @Published public var iconName: String = "1"
     @Published public var menuBarIconText: String = ""
 
     private var cancellables = Set<AnyCancellable>()
@@ -49,11 +48,9 @@ public class MenuBarViewModel: ObservableObject {
     private func updateMenuBarText() {
         guard let display = calendarService.currentDisplay() else {
             menuBarIconText = menuBarText
-            iconName = "1"
             return
         }
 
         menuBarIconText = calendarService.menuBarText(for: display, format: settings.dateFormat, separator: settings.separator)
-        iconName = display.dayString
     }
 }

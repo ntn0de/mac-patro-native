@@ -46,10 +46,6 @@ public final class DateConverter {
         return Date(timeIntervalSince1970: timestamp)
     }
 
-    public static func gregorianToBikramSambat(date: Date) -> NepaliDate {
-        return toNepaliDate(from: date)!
-    }
-
     public static func formatEnglishDate(date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "d MMMM yyyy"

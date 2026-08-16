@@ -3,7 +3,11 @@ name: Release MacPatro Native
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   build-and-release:
@@ -12,85 +16,44 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout repository
+      - name: Checkout release tag
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Set Version from Tag
+      - name: Read version from tag
         run: |
-          # Extract version from tag (e.g., v1.2.3 -> 1.2.3)
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          sed -i '' "s/static let version = \".*\"/static let version = \"$VERSION\"/" MacPatroNative/Sources/Version.swift
+          VERSION=${GITHUB_REF_NAME#v}
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Release tags must use vMAJOR.MINOR.PATCH" >&2
+            exit 1
+          fi
+          git fetch origin main
+          git merge-base --is-ancestor "$(git rev-parse HEAD)" origin/main || {
+            echo "Release tag must point to a commit on main" >&2
+            exit 1
+          }
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Create RemoteURL.swift
         run: |
-          echo 'import Foundation
+          cat > MacPatroNative/Sources/RemoteURL.swift <<'EOF'
+          import Foundation
+
           struct RemoteURL {
               static let urlString = "${{ secrets.REMOTE_URL }}"
-          }' > MacPatroNative/Sources/RemoteURL.swift
-        env:
-          REMOTE_URL: ${{ secrets.REMOTE_URL }}
-
-      - name: Build universal executable
-        run: swift build -c release --arch arm64 --arch x86_64
-
-      - name: Create .app icon
-        run: |
-          mkdir -p icon.iconset
-          sips -z 16 16 MacPatroNative/Resources/icon.png --out icon.iconset/icon_16x16.png
-          sips -z 32 32 MacPatroNative/Resources/icon.png --out icon.iconset/icon_16x16@2x.png
-          sips -z 32 32 MacPatroNative/Resources/icon.png --out icon.iconset/icon_32x32.png
-          sips -z 64 64 MacPatroNative/Resources/icon.png --out icon.iconset/icon_32x32@2x.png
-          sips -z 128 128 MacPatroNative/Resources/icon.png --out icon.iconset/icon_128x128.png
-          sips -z 256 256 MacPatroNative/Resources/icon.png --out icon.iconset/icon_128x128@2x.png
-          sips -z 256 256 MacPatroNative/Resources/icon.png --out icon.iconset/icon_256x256.png
-          sips -z 512 512 MacPatroNative/Resources/icon.png --out icon.iconset/icon_256x256@2x.png
-          sips -z 512 512 MacPatroNative/Resources/icon.png --out icon.iconset/icon_512x512.png
-          sips -z 1024 1024 MacPatroNative/Resources/icon.png --out icon.iconset/icon_512x512@2x.png
-          iconutil -c icns icon.iconset -o MacPatroNative/Resources/icon.icns
-          rm -rf icon.iconset
-
-      - name: Create .app bundle
-        run: |
-          mkdir -p dist/Mac\ Patro.app/Contents/MacOS
-          mkdir -p dist/Mac\ Patro.app/Contents/Resources
-          cp .build/apple/Products/Release/MacPatroNativeApp dist/Mac\ Patro.app/Contents/MacOS/
-          cp MacPatroNative/Resources/icon.icns dist/Mac\ Patro.app/Contents/Resources/
-          PLIST_PATH="dist/Mac Patro.app/Contents/Info.plist"
-          cat << EOF > "$PLIST_PATH"
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>CFBundleExecutable</key>
-              <string>MacPatroNativeApp</string>
-              <key>CFBundleIconFile</key>
-              <string>icon.icns</string>
-              <key>CFBundleIdentifier</key>
-              <string>com.example.MacPatro</string>
-              <key>CFBundleName</key>
-              <string>Mac Patro</string>
-              <key>CFBundlePackageType</key>
-              <string>APPL</string>
-              <key>CFBundleShortVersionString</key>
-              <string>VERSION_PLACEHOLDER</string>
-              <key>CFBundleVersion</key>
-              <string>VERSION_PLACEHOLDER</string>
-              <key>LSMinimumSystemVersion</key>
-              <string>13.0</string>
-              <key>LSUIElement</key>
-              <string>1</string>
-          </dict>
-          </plist>
+          }
           EOF
-          sed -i '' "s/VERSION_PLACEHOLDER/${{ env.VERSION }}/g" "$PLIST_PATH"
+
+      - name: Build application
+        run: ./build.sh "$VERSION"
 
       - name: Install create-dmg
         run: brew install create-dmg
 
       - name: Build DMG
         run: |
-          VERSIONED_DMG="dist/Mac Patro v${{ env.VERSION }}.dmg"
+          VERSIONED_DMG="dist/Mac-Patro-v${VERSION}.dmg"
           create-dmg \
             --volname "Mac Patro Installer" \
             --window-pos 200 120 \
@@ -101,12 +64,35 @@ jobs:
             --app-drop-link 600 185 \
             "$VERSIONED_DMG" \
             "dist/Mac Patro.app"
-          cp "$VERSIONED_DMG" "dist/Mac-Patro-latest.dmg"
+          cp "$VERSIONED_DMG" dist/Mac-Patro-latest.dmg
 
-      - name: Create Release and Upload Asset
+      - name: Calculate SHA256
+        run: |
+          SHA=$(shasum -a 256 dist/Mac-Patro-latest.dmg | awk '{print $1}')
+          echo "CASK_SHA=$SHA" >> "$GITHUB_ENV"
+          echo "SHA256: $SHA"
+
+      - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*.dmg
+          body: |
+            ## Mac Patro v${{ env.VERSION }}
+
+            Homebrew cask SHA256: `${{ env.CASK_SHA }}`
           draft: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: false
+
+      - name: Update Homebrew cask on main
+        run: |
+          git fetch origin main
+          git checkout -B main origin/main
+          sed -i '' -E "s/version \"[^\"]+\"/version \"$VERSION\"/" Casks/mac-patro.rb
+          sed -i '' -E "s/sha256 \"[^\"]+\"/sha256 \"$CASK_SHA\"/" Casks/mac-patro.rb
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Casks/mac-patro.rb
+          git diff --cached --quiet && exit 0
+          git commit -m "chore(homebrew): update cask to v$VERSION"
+          git pull --rebase origin main
+          git push origin HEAD:main

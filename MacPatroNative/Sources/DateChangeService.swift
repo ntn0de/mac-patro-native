@@ -15,12 +15,16 @@ public class DateChangeService {
     
     /// A Combine publisher that emits a `Void` event when the system day changes.
     public let dayDidChange = PassthroughSubject<Void, Never>()
+
+    private var lastKnownDayStart: Date
     
     private init() {
+        lastKnownDayStart = Calendar.current.startOfDay(for: Date())
+
         // For day changes when the app is running
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(handleDayChange),
+            selector: #selector(handlePossibleDayChange),
             name: .NSCalendarDayChanged,
             object: nil
         )
@@ -28,8 +32,16 @@ public class DateChangeService {
         // For day changes that occur while the system is asleep
         NSWorkspace.shared.notificationCenter.addObserver(
             self,
-            selector: #selector(handleDayChange),
+            selector: #selector(handlePossibleDayChange),
             name: NSWorkspace.didWakeNotification,
+            object: nil
+        )
+
+        // Catch overnight transitions if the calendar-day notification was missed.
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self,
+            selector: #selector(handlePossibleDayChange),
+            name: NSWorkspace.sessionDidBecomeActiveNotification,
             object: nil
         )
         
@@ -43,13 +55,20 @@ public class DateChangeService {
         NSWorkspace.shared.notificationCenter.removeObserver(self)
     }
     
-    @objc private func handleDayChange() {
-        #if DEBUG
-        print("DateChangeService detected a day change or system wake. Broadcasting notification.")
-        #endif
-        // Ensure the notification is sent on the main thread, as it will trigger UI updates.
+    @objc private func handlePossibleDayChange() {
         DispatchQueue.main.async {
-            self.dayDidChange.send(())
+            self.publishIfDayChanged()
         }
+    }
+
+    /// Publishes only when the local calendar day has advanced since the last known day.
+    public func publishIfDayChanged() {
+        let todayStart = Calendar.current.startOfDay(for: Date())
+        guard todayStart != lastKnownDayStart else { return }
+        lastKnownDayStart = todayStart
+        #if DEBUG
+        print("DateChangeService detected a day change. Broadcasting notification.")
+        #endif
+        dayDidChange.send(())
     }
 }

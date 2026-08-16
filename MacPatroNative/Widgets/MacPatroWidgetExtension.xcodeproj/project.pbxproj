@@ -1,0 +1,346 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		327A00577C20DAB9B11D6ACE /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D81AB1B69DBD8F0265585B24 /* WidgetKit.framework */; };
+		5606D0EBC3F7D7AC0206EC4A /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FECE71CF66B9B2DADE95B5B /* Utils.swift */; };
+		8004DEFFDCD493F6D2A6F625 /* NepaliMonth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70C4580EBE18D9B4621240D9 /* NepaliMonth.swift */; };
+		B176BB60C6ADC4C961559D70 /* NepaliDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF13934956D7588762696DD0 /* NepaliDate.swift */; };
+		C46EA5362F135B8507FE727A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44BA337FA731589D946E6B9F /* SwiftUI.framework */; };
+		D0FD36E7CB81F4A7BE7BA3E5 /* Calendar+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38260DC557F1C9E677839AEE /* Calendar+Extension.swift */; };
+		D61408102AC88A0A35149DE3 /* CalendarModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67A11C8DC38DDE262866989C /* CalendarModels.swift */; };
+		DCFA5FC45014F2657EC94F73 /* RemoteURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5CE07A5EDA8BC3F9E75B0B /* RemoteURL.swift */; };
+		E1A8A004D9E175A35567DACD /* MacPatroWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE33902B13C36E0D27B4842F /* MacPatroWidgets.swift */; };
+		F774E25BD907FA4FE3D24B59 /* DateConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C2C1393084638B3C1E0D8B /* DateConverter.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0FECE71CF66B9B2DADE95B5B /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		12C2E6FEDC8E02ECFE5B6A2A /* MacPatroWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MacPatroWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		38260DC557F1C9E677839AEE /* Calendar+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Calendar+Extension.swift"; sourceTree = "<group>"; };
+		44BA337FA731589D946E6B9F /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		67A11C8DC38DDE262866989C /* CalendarModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarModels.swift; sourceTree = "<group>"; };
+		70C4580EBE18D9B4621240D9 /* NepaliMonth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NepaliMonth.swift; sourceTree = "<group>"; };
+		D81AB1B69DBD8F0265585B24 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		DE33902B13C36E0D27B4842F /* MacPatroWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPatroWidgets.swift; sourceTree = "<group>"; };
+		DF13934956D7588762696DD0 /* NepaliDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NepaliDate.swift; sourceTree = "<group>"; };
+		E9C2C1393084638B3C1E0D8B /* DateConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateConverter.swift; sourceTree = "<group>"; };
+		FB5CE07A5EDA8BC3F9E75B0B /* RemoteURL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteURL.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D17B62854C6B2AB3E980B4EB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C46EA5362F135B8507FE727A /* SwiftUI.framework in Frameworks */,
+				327A00577C20DAB9B11D6ACE /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		14EFB4A5645012C106A5C718 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				44BA337FA731589D946E6B9F /* SwiftUI.framework */,
+				D81AB1B69DBD8F0265585B24 /* WidgetKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		33A0AEBDE77F7A7B5334CCB7 = {
+			isa = PBXGroup;
+			children = (
+				DE33902B13C36E0D27B4842F /* MacPatroWidgets.swift */,
+				4ED56974BEB827D6F0C013DA /* Sources */,
+				14EFB4A5645012C106A5C718 /* Frameworks */,
+				36CF76AE72075AA7DA4C2919 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		36CF76AE72075AA7DA4C2919 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				12C2E6FEDC8E02ECFE5B6A2A /* MacPatroWidgetExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4ED56974BEB827D6F0C013DA /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				38260DC557F1C9E677839AEE /* Calendar+Extension.swift */,
+				67A11C8DC38DDE262866989C /* CalendarModels.swift */,
+				E9C2C1393084638B3C1E0D8B /* DateConverter.swift */,
+				DF13934956D7588762696DD0 /* NepaliDate.swift */,
+				70C4580EBE18D9B4621240D9 /* NepaliMonth.swift */,
+				FB5CE07A5EDA8BC3F9E75B0B /* RemoteURL.swift */,
+				0FECE71CF66B9B2DADE95B5B /* Utils.swift */,
+			);
+			name = Sources;
+			path = ../Sources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		EBF89B36CCBC8DA0106BF039 /* MacPatroWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 69485F5B54FAE730CC4704E6 /* Build configuration list for PBXNativeTarget "MacPatroWidgetExtension" */;
+			buildPhases = (
+				BD37930893499AA2E2392197 /* Sources */,
+				D17B62854C6B2AB3E980B4EB /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MacPatroWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = MacPatroWidgetExtension;
+			productReference = 12C2E6FEDC8E02ECFE5B6A2A /* MacPatroWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E0976EC400F12BC9C4C43404 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = D4680619DD535D0C4487EF72 /* Build configuration list for PBXProject "MacPatroWidgetExtension" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 33A0AEBDE77F7A7B5334CCB7;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 36CF76AE72075AA7DA4C2919 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EBF89B36CCBC8DA0106BF039 /* MacPatroWidgetExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BD37930893499AA2E2392197 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0FD36E7CB81F4A7BE7BA3E5 /* Calendar+Extension.swift in Sources */,
+				D61408102AC88A0A35149DE3 /* CalendarModels.swift in Sources */,
+				F774E25BD907FA4FE3D24B59 /* DateConverter.swift in Sources */,
+				E1A8A004D9E175A35567DACD /* MacPatroWidgets.swift in Sources */,
+				B176BB60C6ADC4C961559D70 /* NepaliDate.swift in Sources */,
+				8004DEFFDCD493F6D2A6F625 /* NepaliMonth.swift in Sources */,
+				DCFA5FC45014F2657EC94F73 /* RemoteURL.swift in Sources */,
+				5606D0EBC3F7D7AC0206EC4A /* Utils.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		7CAE62D6123469A1C9EB0A68 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_ENTITLEMENTS = MacPatroWidgets.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_DEBUG_DYLIB = NO;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0.12;
+				PRODUCT_BUNDLE_IDENTIFIER = com.agamtech.macpatro.widgets;
+				PRODUCT_NAME = MacPatroWidgetExtension;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.7;
+			};
+			name = Debug;
+		};
+		A84F25CD69FC54A0B3F78424 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		BBB444D4D5D87F877DCF54FA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_ENTITLEMENTS = MacPatroWidgets.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_DEBUG_DYLIB = NO;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 1.0.12;
+				PRODUCT_BUNDLE_IDENTIFIER = com.agamtech.macpatro.widgets;
+				PRODUCT_NAME = MacPatroWidgetExtension;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.7;
+			};
+			name = Release;
+		};
+		D0048D65197F944290436808 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		69485F5B54FAE730CC4704E6 /* Build configuration list for PBXNativeTarget "MacPatroWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7CAE62D6123469A1C9EB0A68 /* Debug */,
+				BBB444D4D5D87F877DCF54FA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D4680619DD535D0C4487EF72 /* Build configuration list for PBXProject "MacPatroWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A84F25CD69FC54A0B3F78424 /* Debug */,
+				D0048D65197F944290436808 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E0976EC400F12BC9C4C43404 /* Project object */;
+}

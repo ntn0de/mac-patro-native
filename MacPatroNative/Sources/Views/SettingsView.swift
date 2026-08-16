@@ -1,5 +1,5 @@
+import ServiceManagement
 import SwiftUI
-import LaunchAtLogin
 
 public struct SettingsView: View {
     @ObservedObject private var settings = SettingsService.shared
@@ -36,37 +36,78 @@ public struct SettingsView: View {
         }
     }
 
+    private var launchAtLogin: Binding<Bool> {
+        Binding {
+            SMAppService.mainApp.status == .enabled
+        } set: { enabled in
+            do {
+                if enabled {
+                    try SMAppService.mainApp.register()
+                } else {
+                    try SMAppService.mainApp.unregister()
+                }
+            } catch {
+                log("Failed to update launch at login:", error)
+            }
+        }
+    }
+
     public var body: some View {
-        VStack {
-            Form {
-                Picker("Format:", selection: $settings.dateFormat) {
+        VStack(alignment: .leading, spacing: 12) {
+            settingPicker(icon: "textformat", title: "Format") {
+                Picker("Format", selection: $settings.dateFormat) {
                     ForEach(SettingsService.DateFormat.allCases) { format in
                         Text(exampleString(for: format)).tag(format)
                     }
                 }
-                
-                Picker("Separator:", selection: $settings.separator) {
+                .labelsHidden()
+                .frame(width: 150)
+            }
+
+            Divider()
+
+            settingPicker(icon: "arrow.left.and.right", title: "Separator") {
+                Picker("Separator", selection: $settings.separator) {
                     ForEach(SettingsService.Separator.allCases) { separator in
                         Text(separator.nepaliName).tag(separator)
                     }
                 }
-                
-                Toggle("Show Nepal Time", isOn: $settings.showNepalTime)
-                LaunchAtLogin.Toggle()
+                .labelsHidden()
+                .frame(width: 150)
             }
-            
-            Spacer()
-            
+
+            Divider()
+
+            Toggle(isOn: $settings.showNepalTime) {
+                Label("Show Nepal Time", systemImage: "clock")
+            }
+
+            Toggle(isOn: launchAtLogin) {
+                Label("Launch at Login", systemImage: "power")
+            }
+
+            Divider()
+
             CheckForUpdatesView()
-            
-            Spacer()
-            
-            Button("Close") {
-                dismiss()
+
+            HStack {
+                Spacer()
+                Button("Close") {
+                    dismiss()
+                }
+                .keyboardShortcut(.defaultAction)
             }
-            .keyboardShortcut(.defaultAction)
         }
         .padding()
-        .frame(width: 300, height: 300)
+        .frame(width: 380)
+    }
+
+    @ViewBuilder
+    private func settingPicker<Content: View>(icon: String, title: String, @ViewBuilder content: () -> Content) -> some View {
+        HStack {
+            Label(title, systemImage: icon)
+            Spacer()
+            content()
+        }
     }
 }

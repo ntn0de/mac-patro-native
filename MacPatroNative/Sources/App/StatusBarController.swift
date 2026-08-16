@@ -24,28 +24,34 @@ class StatusBarController: NSObject, NSPopoverDelegate {
 
         super.init()
 
-        popover.contentSize = NSSize(width: 360, height: 480)
+        popover.contentSize = NSSize(width: 360, height: 680)
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(rootView: mainView)
         popover.delegate = self
+        NotificationCenter.default.addObserver(self, selector: #selector(updatePopoverHeight(_:)), name: .popoverContentHeightDidChange, object: nil)
         
         let aboutMenuItem = NSMenuItem(title: "About", action: #selector(about), keyEquivalent: "")
+        aboutMenuItem.image = menuImage("info.circle")
         aboutMenuItem.target = self
         menu.addItem(aboutMenuItem)
         
         let forceUpdateMenuItem = NSMenuItem(title: "Force update year data", action: #selector(forceUpdate), keyEquivalent: "")
+        forceUpdateMenuItem.image = menuImage("arrow.clockwise")
         forceUpdateMenuItem.target = self
         menu.addItem(forceUpdateMenuItem)
 
         let dateConverterMenuItem = NSMenuItem(title: "Date Converter...", action: #selector(openDateConverter), keyEquivalent: "")
+        dateConverterMenuItem.image = menuImage("arrow.left.arrow.right")
         dateConverterMenuItem.target = self
         menu.addItem(dateConverterMenuItem)
 
         let settingsMenuItem = NSMenuItem(title: "Settings...", action: #selector(openSettings), keyEquivalent: ",")
+        settingsMenuItem.image = menuImage("gearshape")
         settingsMenuItem.target = self
         menu.addItem(settingsMenuItem)
 
         let quitMenuItem = NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        quitMenuItem.image = menuImage("xmark.circle")
         menu.addItem(quitMenuItem)
         
         menuBarViewModel.$menuBarIconText.assign(to: \.title, on: statusItem.button!).store(in: &cancellables)
@@ -61,6 +67,19 @@ class StatusBarController: NSObject, NSPopoverDelegate {
                 self.closePopover(sender: event)
             }
         }
+    }
+
+    private func menuImage(_ symbolName: String) -> NSImage? {
+        let image = NSImage(systemSymbolName: symbolName, accessibilityDescription: nil)
+        image?.isTemplate = true
+        return image
+    }
+
+    @objc private func updatePopoverHeight(_ notification: Notification) {
+        guard let height = notification.userInfo?["height"] as? NSNumber else { return }
+        let newHeight = CGFloat(height.doubleValue)
+        guard abs(popover.contentSize.height - newHeight) > 0.5 else { return }
+        popover.contentSize = NSSize(width: 360, height: newHeight)
     }
 
     @objc func togglePopover(_ sender: Any?) {
@@ -79,6 +98,7 @@ class StatusBarController: NSObject, NSPopoverDelegate {
                     NSApp.activate(ignoringOtherApps: true)
                     popover.show(relativeTo: positioningRect, of: button, preferredEdge: .minY)
                     NotificationCenter.default.post(name: .calendarPopoverDidOpen, object: nil)
+                    WidgetReload.reload()
                     eventMonitor?.start()
                 }
             }
@@ -87,6 +107,16 @@ class StatusBarController: NSObject, NSPopoverDelegate {
     
     func closePopover(sender: Any?) {
         popover.performClose(sender)
+    }
+
+    func openCalendar() {
+        guard !popover.isShown, let button = statusItem.button else { return }
+        let positioningRect = NSRect(x: 0, y: button.bounds.height + 12, width: button.bounds.width, height: 0)
+        NSApp.activate(ignoringOtherApps: true)
+        popover.show(relativeTo: positioningRect, of: button, preferredEdge: .minY)
+        NotificationCenter.default.post(name: .calendarPopoverDidOpen, object: nil)
+        WidgetReload.reload()
+        eventMonitor?.start()
     }
     
     func popoverDidClose(_ notification: Notification) {
