@@ -35,7 +35,7 @@ public struct AboutView: View {
 
             DisclosureGroup {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("If macOS blocks the app, run this in Terminal:")
+                    Text("If macOS blocks the app, quit it and run this in Terminal. After a Homebrew install, run it even if the app already launched:")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     Text(quarantineCommand)

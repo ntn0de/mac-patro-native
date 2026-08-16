@@ -34,7 +34,7 @@ public struct CheckForUpdatesView: View {
 
             DisclosureGroup {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("If macOS says Mac Patro is damaged or should be moved to the Trash, run this in Terminal:")
+                    Text("If macOS says Mac Patro is damaged, quit the app and run this in Terminal. After a Homebrew install, run it even if the app already launched:")
                         .font(.caption)
                         .foregroundStyle(.secondary)
 

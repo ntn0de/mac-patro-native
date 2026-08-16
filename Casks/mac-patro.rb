@@ -10,7 +10,10 @@ cask "mac-patro" do
   app "Mac Patro.app"
 
   caveats <<~EOS
-    If macOS blocks the app after installation, run:
+    If an existing Mac Patro.app is already in /Applications, quit it and
+    delete that copy before installing with Homebrew.
+
+    After installation, if macOS blocks the app, run:
       xattr -cr /Applications/Mac\ Patro.app
   EOS
 end

@@ -6,9 +6,24 @@ A simple and lightweight macOS menu bar application to display the Nepali date.
 
 ### Homebrew
 
+Homebrew 6+ will not load this third-party cask until you trust it once:
+
 ```bash
 brew tap ntn0de/mac-patro-native https://github.com/ntn0de/mac-patro-native
+brew trust --cask ntn0de/mac-patro-native/mac-patro
+```
+
+If `Mac Patro.app` is already in Applications (a DMG, test build, or older copy), quit it and remove that copy so Homebrew can install:
+
+```bash
+rm -rf /Applications/Mac\ Patro.app
+```
+
+Then install and clear macOS quarantine:
+
+```bash
 brew install --cask mac-patro
+xattr -cr /Applications/Mac\ Patro.app
 ```
 
 Update later with:
@@ -16,6 +31,7 @@ Update later with:
 ```bash
 brew update
 brew upgrade --cask mac-patro
+xattr -cr /Applications/Mac\ Patro.app
 ```
 
 ### Direct Download
@@ -31,15 +47,17 @@ If macOS says the app is damaged or should be moved to the Trash, see the **Trou
 
 ### "App is damaged and can’t be opened. You should move it to the Trash."
 
-This can happen if macOS has quarantined the app because it was downloaded from the internet and not notarized. To fix this, open the Terminal app and run the following command, which removes the quarantine attribute from the app.
+This can happen if macOS has quarantined the app because it was downloaded from the internet and not notarized. Quit Mac Patro, then run:
 
 ```bash
 xattr -cr /Applications/Mac\ Patro.app
 ```
 
-After running the command, you should be able to open the app.
+If a Homebrew install failed because the app already existed, delete `/Applications/Mac Patro.app` first, install again, then run the `xattr` command.
 
-If you already have Mac Patro open, the same command is also shown inside the app under **Settings → Check for Updates** and **About**.
+After that, you should be able to open the app.
+
+The same `xattr` command is also shown inside the app under **Settings → Check for Updates** and **About**.
 
 
 ## Building from Source
