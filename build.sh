@@ -44,8 +44,22 @@ rm -rf "$APP_BUNDLE"
 mkdir -p "$MACOS" "$RESOURCES" "$PLUGINS"
 cp "$PRODUCTS/$EXECUTABLE_NAME" "$MACOS/"
 cp MacPatroNative/Resources/icon.icns "$RESOURCES/AppIcon.icns"
-ditto "$PRODUCTS/MacPatroNative_MacPatroKit.bundle" \
-    "$RESOURCES/MacPatroNative_MacPatroKit.bundle"
+cp MacPatroNative/Resources/*.json "$RESOURCES/"
+
+RESOURCE_BUNDLE=""
+for candidate in \
+    "$PRODUCTS/MacPatroNative_MacPatroKit.bundle" \
+    .build/arm64-apple-macosx/release/MacPatroNative_MacPatroKit.bundle \
+    .build/x86_64-apple-macosx/release/MacPatroNative_MacPatroKit.bundle
+do
+    if [[ -d "$candidate" ]]; then
+        RESOURCE_BUNDLE="$candidate"
+        break
+    fi
+done
+if [[ -n "$RESOURCE_BUNDLE" ]]; then
+    ditto "$RESOURCE_BUNDLE" "$RESOURCES/MacPatroNative_MacPatroKit.bundle"
+fi
 
 ditto "$WIDGET_ARM_PRODUCTS/MacPatroWidgetExtension.appex" "$WIDGET_BUNDLE"
 lipo -create \
