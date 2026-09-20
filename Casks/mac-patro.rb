@@ -1,6 +1,6 @@
 cask "mac-patro" do
-  version "1.1.0"
-  sha256 "98cede9edc51cb20b31f24560323791726ef474914d676569e50014458038139"
+  version "1.1.1"
+  sha256 "6fe21b2f518a41d6462c09ef0bef9488532bb4b26cba6e8f9d6bc8cc94f7fb0b"
 
   url "https://github.com/ntn0de/mac-patro-native/releases/download/v#{version}/Mac-Patro-latest.dmg"
   name "Mac Patro"
