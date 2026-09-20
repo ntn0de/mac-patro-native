@@ -45,6 +45,9 @@ jobs:
           }
           EOF
 
+      - name: Run tests
+        run: swift test
+
       - name: Build application
         run: ./build.sh "$VERSION"
 

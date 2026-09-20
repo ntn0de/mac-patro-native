@@ -13,7 +13,7 @@ Mac Patro is a macOS 13+ SwiftUI menu-bar application built with Swift Package M
 ## Working Rules
 
 - Make the smallest change that satisfies the request.
-- Do not commit changes until the user has approved the commit message.
+- Do not commit, push, tag, or deploy without explicit user confirmation. Commit messages also require user approval.
 - Match the existing Swift style; do not introduce architecture or dependencies speculatively.
 - Prefer Swift, SwiftUI, Foundation, AppKit, and ServiceManagement APIs already available on macOS 13+.
 - Do not commit secrets or a private calendar-data URL. `MacPatroNative/Sources/RemoteURL.swift` is local configuration.
@@ -34,10 +34,12 @@ App size, memory use, and responsiveness are product requirements—not cleanup 
 Calendar conversion is correctness-critical.
 
 - Active month-length data is encoded in `MacPatroNative/Sources/DateConverter.swift`.
-- `MacPatroNative/Sources/NepaliDateData.swift` is intentionally retained as reference data. It currently differs from the active encoded data for BS 2083–2086.
+- `MacPatroNative/Sources/NepaliDateData.swift` is intentionally retained as reference data. It currently differs from the active encoded data for BS 2084–2086. BS 2083 was verified against published calendar grids; boundaries are recorded in `docs/calendar-data-2083.md`, with source provenance retained privately.
 - Do not delete, regenerate, or reconcile either table without an authoritative source and explicit conversion fixtures for affected years.
 - Do not change epochs, time zones, month lengths, supported ranges, or conversion arithmetic as part of unrelated refactors.
 - After any calendar-related change, run the full supported-range test and the complete suite.
+- Calendar-data corrections require independently sourced month-boundary fixtures in both conversion directions; round-trip tests alone cannot establish accuracy.
+- Before each Nepali new year, verify the upcoming year's data against a published calendar. The technical supported range is not a claim that every year has been independently verified.
 
 ## Validation
 

@@ -57,6 +57,21 @@ final class CalendarViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.upcomingEvents().map(\.title), ["Today", "Tomorrow"])
     }
 
+    func testAsoj2083CalendarIncludesDay31() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let date = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 10, day: 17)))
+        let service = NepaliCalendarService(currentDateProvider: { date })
+        let viewModel = CalendarViewModel(date: date, dataService: MockDataService(), calendarService: service)
+        viewModel.generateCalendar()
+
+        let currentMonthDays = viewModel.days.filter(\.isCurrentMonth)
+        XCTAssertEqual(currentMonthDays.count, 31)
+        XCTAssertEqual(currentMonthDays.last?.nepaliDay, "३१")
+        XCTAssertEqual(currentMonthDays.last?.date, date)
+        XCTAssertEqual(viewModel.days.first(where: { $0.date == date })?.isCurrentMonth, true)
+    }
+
     func testForceRefreshBypassesCache() {
         let expectation = self.expectation(description: "Force refresh bypasses cache")
 

@@ -27,7 +27,7 @@ final class DateConverterTests: XCTestCase {
             
             XCTAssertEqual(components.year, expectedGregDate[0])
             XCTAssertEqual(components.month, expectedGregDate[1])
-//            XCTAssertEqual(components.day, expectedGregDate[2])
+            XCTAssertEqual(components.day, expectedGregDate[2])
         }
     }
 
@@ -56,6 +56,57 @@ final class DateConverterTests: XCTestCase {
             XCTAssertEqual(bsDate.bsMonth, expectedBSDate[1])
             XCTAssertEqual(bsDate.bsDay, expectedBSDate[2])
         }
+    }
+
+    func testAsoj2083Boundary() throws {
+        // Verified Asoj boundary; see docs/calendar-data-2083.md.
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let asoj31 = NepaliDate(bsYear: 2083, bsMonth: 6, bsDay: 31)
+        let kartik1 = NepaliDate(bsYear: 2083, bsMonth: 7, bsDay: 1)
+        let october17 = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 10, day: 17)))
+        let october18 = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 10, day: 18)))
+
+        XCTAssertEqual(DateConverter.daysInMonth(year: 2083, month: 6), 31)
+        XCTAssertEqual(DateConverter.toGregorianDate(from: asoj31), october17)
+        XCTAssertEqual(DateConverter.toGregorianDate(from: kartik1), october18)
+        XCTAssertEqual(DateConverter.toNepaliDate(from: october17), asoj31)
+        XCTAssertEqual(DateConverter.toNepaliDate(from: october18), kartik1)
+        XCTAssertNil(DateConverter.toGregorianDate(from: NepaliDate(bsYear: 2083, bsMonth: 6, bsDay: 32)))
+    }
+
+    func testPublished2083MonthBoundaries() throws {
+        // Independently verified calendar boundaries; see docs/calendar-data-2083.md.
+        let monthLengths = [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30]
+        let gregorianStarts = [
+            [2026, 4, 14], [2026, 5, 15], [2026, 6, 15], [2026, 7, 17],
+            [2026, 8, 17], [2026, 9, 17], [2026, 10, 18], [2026, 11, 17],
+            [2026, 12, 16], [2027, 1, 15], [2027, 2, 13], [2027, 3, 15],
+            [2027, 4, 14]
+        ]
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let starts = try gregorianStarts.map { parts in
+            try XCTUnwrap(calendar.date(from: DateComponents(year: parts[0], month: parts[1], day: parts[2])))
+        }
+
+        for month in 1...12 {
+            let length = monthLengths[month - 1]
+            let firstDay = NepaliDate(bsYear: 2083, bsMonth: month, bsDay: 1)
+            let lastDay = NepaliDate(bsYear: 2083, bsMonth: month, bsDay: length)
+            let lastGregorian = try XCTUnwrap(calendar.date(byAdding: .day, value: -1, to: starts[month]))
+
+            XCTAssertEqual(DateConverter.daysInMonth(year: 2083, month: month), length, "Month \(month)")
+            XCTAssertEqual(DateConverter.toGregorianDate(from: firstDay), starts[month - 1], "Month \(month) start")
+            XCTAssertEqual(DateConverter.toNepaliDate(from: starts[month - 1]), firstDay, "Month \(month) start")
+            XCTAssertEqual(DateConverter.toGregorianDate(from: lastDay), lastGregorian, "Month \(month) end")
+            XCTAssertEqual(DateConverter.toNepaliDate(from: lastGregorian), lastDay, "Month \(month) end")
+            XCTAssertNil(DateConverter.toGregorianDate(from: NepaliDate(bsYear: 2083, bsMonth: month, bsDay: length + 1)))
+        }
+
+        let newYear = NepaliDate(bsYear: 2084, bsMonth: 1, bsDay: 1)
+        XCTAssertEqual(DateConverter.toGregorianDate(from: newYear), starts[12])
+        XCTAssertEqual(DateConverter.toNepaliDate(from: starts[12]), newYear)
     }
 
     func testNepaliMonthNavigationAcrossSupportedDates() {
