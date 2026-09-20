@@ -15,7 +15,7 @@ for _ in {1..20}; do
 done
 pkill -x MacPatroNativeApp >/dev/null 2>&1 || true
 
-./build.sh "${1:-1.0.12}"
+LOCAL_BUILD=1 ./build.sh "${1:-1.0.12}"
 rm -rf "$INSTALL_PATH"
 ditto "$APP_BUNDLE" "$INSTALL_PATH"
 

@@ -18,7 +18,10 @@ WIDGET_X86_PRODUCTS=".build/WidgetExtension-x86_64/Build/Products/Release"
 VERSION="${1:-1.0.12}"
 BUILD_TIMESTAMP="${BUILD_TIMESTAMP:-$(date +%Y-%m-%d-%H%M%S)}"
 BUILD_NUMBER="${BUILD_TIMESTAMP//-/}"
-DISPLAY_VERSION="$VERSION--build-$BUILD_TIMESTAMP"
+DISPLAY_VERSION="$VERSION"
+if [[ "${LOCAL_BUILD:-0}" == "1" ]]; then
+    DISPLAY_VERSION="$VERSION--build-$BUILD_TIMESTAMP"
+fi
 
 if [[ ! "$VERSION" =~ ^[0-9]+(\.[0-9]+){1,2}$ ]]; then
     echo "Version must be numeric, for example: 1.0.12" >&2

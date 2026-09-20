@@ -17,7 +17,7 @@ Mac Patro is a macOS 13+ SwiftUI menu-bar application built with Swift Package M
 - Match the existing Swift style; do not introduce architecture or dependencies speculatively.
 - Prefer Swift, SwiftUI, Foundation, AppKit, and ServiceManagement APIs already available on macOS 13+.
 - Do not commit secrets or a private calendar-data URL. `MacPatroNative/Sources/RemoteURL.swift` is local configuration.
-- Keep app bundle versions numeric. `build.sh` exposes local builds as `<version>--build-<timestamp>` through `CFBundleGetInfoString`.
+- Keep app bundle versions numeric. `build-local.sh` enables `<version>--build-<timestamp>` through `CFBundleGetInfoString`; release builds display only `<version>`.
 
 ## Product Quality
 
@@ -67,7 +67,7 @@ Build and package a universal app:
 ./build.sh 1.0.13      # explicit numeric version
 ```
 
-The output is `dist/Mac Patro.app`. The script copies the SwiftPM resource bundle, keeps `CFBundleShortVersionString` numeric, uses `YYYYMMDDHHMMSS` for `CFBundleVersion`, and displays `<version>--build-<timestamp>` in the About window. Override the timestamp only for reproducible builds with `BUILD_TIMESTAMP=YYYY-MM-DD-HHMMSS`.
+The output is `dist/Mac Patro.app`. The script copies the SwiftPM resource bundle, keeps `CFBundleShortVersionString` numeric, uses `YYYYMMDDHHMMSS` for `CFBundleVersion`, and displays `<version>` in the About window. `build-local.sh` sets `LOCAL_BUILD=1` to display `<version>--build-<timestamp>` for local installs only. Override the timestamp only for reproducible builds with `BUILD_TIMESTAMP=YYYY-MM-DD-HHMMSS`.
 
 ## Releases and Homebrew
 
